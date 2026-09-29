@@ -1503,6 +1503,18 @@ body:not(.civ) .civ-only{display:none!important}
 html.ob-lock,html.ob-lock body{overflow:hidden!important}
 </style>
 <style>@media(max-width:560px){.b-pie-wrap{grid-template-columns:minmax(0,1fr)!important}.b-pie-wrap #b-pie{max-width:230px;margin:0 auto}#tab-debts div[style*="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr auto"],#tab-debts div[style*="grid-template-columns:1fr 1fr 1fr 1fr 1fr;"]:has(input),#tab-portfolio div[style*="grid-template-columns:2fr 1.5fr 1.3fr 1.1fr auto"],#tab-purchases div[style*="grid-template-columns:2fr 1fr 1fr 1fr auto"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}#tab-debts div[style*="grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr auto"]>:first-child,#tab-debts div[style*="grid-template-columns:1fr 1fr 1fr 1fr 1fr;"]:has(input)>:first-child,#tab-portfolio div[style*="grid-template-columns:2fr 1.5fr 1.3fr 1.1fr auto"]>:first-child,#tab-purchases div[style*="grid-template-columns:2fr 1fr 1fr 1fr auto"]>:first-child{grid-column:1/-1}}</style>
+<style>
+.pa-box{border:1px solid var(--border);border-radius:10px;padding:.5rem .6rem;margin:.35rem 0 .5rem;background:var(--surface2)}
+.pa-box.on{border-color:var(--green)}
+.pa-hd{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}.pa-hd b{font-size:.62rem;color:var(--text)}.pa-hd span{font-size:.5rem;color:var(--muted);flex:1;min-width:120px}
+.pa-set{display:flex;flex-wrap:wrap;gap:.35rem .8rem;margin:.4rem 0;font-size:.54rem;color:var(--muted)}.pa-set label{display:flex;align-items:center;gap:.25rem;white-space:nowrap}
+.pa-row{display:grid;grid-template-columns:86px minmax(0,1fr) auto;gap:.5rem;font-size:.55rem;padding:.24rem 0;border-top:1px solid var(--border);align-items:center}
+.pa-d{color:var(--muted)}.pa-why{color:var(--text)}.pa-why em{color:var(--muted);font-style:normal}
+.pa-amt{font-family:'JetBrains Mono',monospace;text-align:right;color:var(--text)}.pa-amt small{display:block;font-size:.48rem}
+.pa-warn{font-size:.52rem;color:var(--orange);margin:.3rem 0;line-height:1.45}
+.pa-prev,.pa-more,.pa-man{font-size:.5rem;color:var(--muted);margin:.2rem 0}
+@media(max-width:560px){.pa-row{grid-template-columns:68px minmax(0,1fr) auto}}
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute;pointer-events:none" aria-hidden="true"><defs><symbol viewBox="0 0 24 24" id="i-pencil"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol><symbol viewBox="0 0 24 24" id="i-trash"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol><symbol viewBox="0 0 24 24" id="i-x"><path d="M18 6 6 18"/><path d="M6 6l12 12"/></symbol><symbol viewBox="0 0 24 24" id="i-plus"><path d="M12 5v14"/><path d="M5 12h14"/></symbol><symbol viewBox="0 0 24 24" id="i-chevron-right"><path d="m9 18 6-6-6-6"/></symbol><symbol viewBox="0 0 24 24" id="i-chevron-down"><path d="m6 9 6 6 6-6"/></symbol><symbol viewBox="0 0 24 24" id="i-chevron-up"><path d="m18 15-6-6-6 6"/></symbol><symbol viewBox="0 0 24 24" id="i-archive"><rect x="2" y="4" width="20" height="5" rx="1"/><path d="M4 9v10a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M10 13h4"/></symbol><symbol viewBox="0 0 24 24" id="i-refresh"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v4h-4"/></symbol><symbol viewBox="0 0 24 24" id="i-lock"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol><symbol viewBox="0 0 24 24" id="i-unlock"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.9-1"/></symbol><symbol viewBox="0 0 24 24" id="i-download"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></symbol><symbol viewBox="0 0 24 24" id="i-upload"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/></symbol><symbol viewBox="0 0 24 24" id="i-printer"><path d="M6 9V2h12v7"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M6 17h12v5H6z"/></symbol><symbol viewBox="0 0 24 24" id="i-arrow-up-right"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></symbol><symbol viewBox="0 0 24 24" id="i-settings"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-2.82 1.17V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 6.6 19.4l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.94 13H4a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 6.6 6.6l-.06-.06A2 2 0 1 1 9.37 3.7l.06.06A1.65 1.65 0 0 0 11 4.94V4a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 2.83 1.17l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 11H21a2 2 0 0 1 0 4h-.09Z"/></symbol><symbol viewBox="0 0 24 24" id="i-alert"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol><symbol viewBox="0 0 24 24" id="i-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol><symbol viewBox="0 0 24 24" id="i-check"><path d="M20 6 9 17l-5-5"/></symbol><symbol viewBox="0 0 24 24" id="i-dashboard"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol><symbol viewBox="0 0 24 24" id="i-wallet"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H4a2 2 0 0 1-2-2V5"/><path d="M18 12h.01"/></symbol><symbol viewBox="0 0 24 24" id="i-credit-card"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol><symbol viewBox="0 0 24 24" id="i-banknote"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></symbol><symbol viewBox="0 0 24 24" id="i-line-chart"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></symbol><symbol viewBox="0 0 24 24" id="i-flame"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></symbol><symbol viewBox="0 0 24 24" id="i-award"><circle cx="12" cy="8" r="6"/><path d="M15.5 12.9 17 22l-5-3-5 3 1.5-9.1"/></symbol><symbol viewBox="0 0 24 24" id="i-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2 2h2l2.7 12.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L22 6H5"/></symbol><symbol viewBox="0 0 24 24" id="i-wrench"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76Z"/></symbol><symbol viewBox="0 0 24 24" id="i-target"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></symbol></defs></svg><style>.ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.14em;flex:0 0 auto}.tab-btn .ic{width:15px;height:15px;margin-right:6px;vertical-align:-2px}.iconbtn-dt .ic,.pi-del .ic{width:16px;height:16px}.btn .ic{width:14px;height:14px;margin-right:5px;vertical-align:-2px}.modal-close .ic{width:15px;height:15px;margin-right:4px;vertical-align:-2px}.ic-sm{width:13px;height:13px}.dtx-mbtns .ic{width:12px;height:12px}.reset-card-btn .ic{width:11px;height:11px;margin-right:3px;vertical-align:-1px}.assump-btn .ic{width:12px;height:12px;margin-right:3px;vertical-align:-2px}#tools-bar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:1rem}#tools-bar .tools-lbl{font-size:.56rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}#tools-bar select{flex:1;max-width:360px;font-size:.8rem;font-family:inherit;padding:.45rem .6rem;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:9px;cursor:pointer}</style>
@@ -3967,6 +3979,7 @@ function gatherState(){
     debtTermUnit: 'months',
     decisionLog: (typeof decisionLog!=='undefined'&&Array.isArray(decisionLog)?decisionLog:[]),
     rothBasis: (typeof rothBasis!=='undefined'?rothBasis:{amt:null,asOf:null}),
+    payAuto: (typeof payAuto!=='undefined'?payAuto:null),
     profile: (typeof profile!=='undefined'?profile:null), gs: (typeof gsState!=='undefined'?gsState:null), sample: ((typeof planSample!=='undefined'&&planSample)||undefined),
     peState: (typeof peState!=='undefined'?peState:null),
     fpHistory: fpHistory,
@@ -4052,6 +4065,7 @@ function applyState(s){
   debts=Array.isArray(s.debts)?s.debts:[];
   if(s.debtTermUnit!=='months'){const _tl=_migrateDebtTermsToMonths(debts);window._termMigrationLog=_tl;if(_tl.length&&typeof toast==='function')setTimeout(function(){toast('Debt terms converted to months: '+_tl.join(' · '),'var(--accent)');},1200);}
   debtManualOrder=Array.isArray(s.debtManualOrder)?s.debtManualOrder.slice():[];
+  payAuto=(s.payAuto&&typeof s.payAuto==='object')?s.payAuto:null;
   profile=(s.profile&&s.profile.type)?{type:(s.profile.type==='civilian'?'civilian':'military'),branch:(s.profile.type==='civilian'?'':(s.profile.branch||'Navy'))}:{type:'military',branch:'Navy'};gsState=(s.gs&&typeof s.gs==='object')?s.gs:null;planSample=!!s.sample;if(typeof applyProfile==='function')setTimeout(applyProfile,0);decisionLog=Array.isArray(s.decisionLog)?s.decisionLog.slice(0,60):[];rothBasis=(s.rothBasis&&typeof s.rothBasis==='object')?{amt:(s.rothBasis.amt!=null&&s.rothBasis.amt!==''?+s.rothBasis.amt:null),asOf:s.rothBasis.asOf||null}:{amt:null,asOf:null};if(el('a-roth-basis'))el('a-roth-basis').value=(rothBasis.amt!=null?rothBasis.amt:'');peState=(s.peState&&typeof s.peState==='object')?{rwin:+s.peState.rwin||10,rcustom:(s.peState.rcustom!=null&&s.peState.rcustom!==''?s.peState.rcustom:null),grade:s.peState.grade||'O3E',pgrade:s.peState.pgrade||'',pdate:s.peState.pdate||'',ret:s.peState.ret||((s.rc_y1&&/^\d{4}-\d{2}$/.test(s.rc_y1))?s.rc_y1:'')}:{rwin:10,rcustom:null,grade:'O3E',pgrade:'',pdate:'',ret:((s.rc_y1&&/^\d{4}-\d{2}$/.test(s.rc_y1))?s.rc_y1:'')};setTimeout(function(){try{peRender();}catch(e){}},0);setTimeout(function(){try{_rothBasisLbl();}catch(e){}},0);if(typeof renderDecisionLog==='function')setTimeout(function(){try{renderDecisionLog();}catch(e){}},0);
   fpHistory=(s.fpHistory&&typeof s.fpHistory==='object')?s.fpHistory:{monthly:[],daily:[]};
   fpGoals=Array.isArray(s.fpGoals)?s.fpGoals:[];
@@ -6922,7 +6936,7 @@ function _ensureClient(){
 // backup key (recovery). Returns true on success; surfaces failures instead of
 // silently lying that everything is saved.
 function persistNow(){
-  if(typeof _OB!=='undefined'&&_OB.open)return false;
+  if(window.__tfSetup||(typeof _OB!=='undefined'&&_OB.open))return false;   // no plan yet: setup is open
   try{
     const st=gatherState();
     const blob=JSON.stringify(st);
@@ -7033,7 +7047,7 @@ function fullReset(){
   if(typeof refreshClientSelect==='function')refreshClientSelect();
   set('client-display','New Plan');
   if(typeof toast==='function')toast('All data cleared — blank slate.','var(--red)');
-  profile={type:'military',branch:'Navy'};gsState=null;planSample=false;if(typeof applyProfile==='function')applyProfile();if(typeof obOpen==='function')setTimeout(function(){obOpen();},250);
+  profile={type:'military',branch:'Navy'};gsState=null;planSample=false;if(typeof applyProfile==='function')applyProfile();window.__tfSetup=true;if(typeof obOpen==='function')setTimeout(function(){obOpen();},250);
 }
 
 // ═══════════════════════════════════════════════════
@@ -8851,6 +8865,7 @@ function showMetricInfo(key){
    drops any debt whose regular payment has finished by that date. When the
    as-of date is today (the default) behaviour is identical to before. */
 let payForecast={};                 // { 'b-pay':[{date:'YYYY-MM-DD',amount:Number}, ...], ... }
+var payAuto=null;                   // automatic pay forecast settings {on,bah,bahG,bahP,fed,civG}; manual b-pay steps stay in payForecast
 const PF_FIELDS=['b-pay','b-pay2','b-side','b-other-inc'];
 const PF_NAMES={'b-pay':'Primary Take-Home','b-pay2':'Spouse / Partner','b-side':'Side / Freelance','b-other-inc':'Other Income'};
 function _pfPad(n){return String(n).padStart(2,'0');}
@@ -8858,10 +8873,108 @@ function _pfISO(d){return d.getFullYear()+'-'+_pfPad(d.getMonth()+1)+'-'+_pfPad(
 function _pfTodayISO(){return _pfISO(new Date());}
 function budgetAsOfISO(){const e=el('pf-asof');const v=e&&e.value?e.value:'';return v||_pfTodayISO();}
 function pfIsFuture(){return budgetAsOfISO()>_pfTodayISO();}
-function pfSteps(id){return (Array.isArray(payForecast[id])?payForecast[id]:[]).filter(s=>s&&s.date).slice().sort((a,b)=>(a.date<b.date?-1:(a.date>b.date?1:0)));}
+function pfSteps(id){if(id==='b-pay'&&typeof _paOn==='function'&&_paOn())return _paSteps();return (Array.isArray(payForecast[id])?payForecast[id]:[]).filter(s=>s&&s.date).slice().sort((a,b)=>(a.date<b.date?-1:(a.date>b.date?1:0)));}
 // Effective monthly amount for ANY budget field (income or expense) as of a date.
 function fieldValAsOf(id,iso){const asof=iso||budgetAsOfISO();let amt=val(id);pfSteps(id).forEach(s=>{if(s.date<=asof)amt=parseFloat(s.amount)||0;});return amt;}
 function incValAsOf(id){return fieldValAsOf(id);}   // back-compat alias
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// AUTOMATIC PAY FORECAST — primary take-home steps itself up, no manual entries
+// Military: every January raise, every longevity step (service-date anniversaries) and a planned
+// promotion come from the same pay engine as the Military Retirement tab. The change in take-home
+// = change in basic pay after federal tax + FICA (no state tax), plus BAS and BAH growth (both tax-free).
+// Civilian: take-home grows by a yearly raise % each January.
+// The steps feed everything that reads future pay (Budget "as of" views, the monthly ledger, Mission
+// Control's "left over", the Decision Studio). Pay stops at retirement exactly as before (the ledger
+// already drops primary pay from the pension year). Manual pay steps are kept and come back if the
+// automatic forecast is turned off.
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+const PA_DEF={bahG:4.2,basG:2.4,fed:22,civG:3};   // BAH: DoD 2026 average +4.2% (2024–25: +5.4%) · BAS 2025→2026 +2.4% · 22% federal bracket
+const SS_WAGE_BASE=184500;                          // 2026 Social Security taxable maximum (ssa.gov)
+function _pa(){return Object.assign({on:false,bah:0,bahG:PA_DEF.bahG,bahP:null,fed:PA_DEF.fed,st:0,civG:PA_DEF.civG},(typeof payAuto!=='undefined'&&payAuto)||{});}
+function _paOn(){return !!(typeof payAuto!=='undefined'&&payAuto&&payAuto.on);}
+function _paBasBase(grade){const B=(typeof BAS_2026!=='undefined')?BAS_2026:{enlisted:0,officer:0};return /^E/.test(grade||'')?B.enlisted:B.officer;}
+// Pure: steps for a military member. p = _peParams(...), base = today's take-home, A = settings, today = Date.
+function _paMilCompute(p,base,A,today){
+  const out=[];const end=p.retD;if(!p.pebdD||!end||!(end>today))return out;
+  const fed=((+A.fed||0)+(+A.st||0))/100,bahG=(+A.bahG||0)/100,basG=PA_DEF.basG/100;
+  const basYr=+(((typeof REF_META!=='undefined'&&REF_META.bas&&REF_META.bas.effective)||'2026')).slice(0,4);
+  const at=d=>{const g=peGradeAt(d,p),basic=peBasicNom(d,p),jans=d.getFullYear()-today.getFullYear();
+    const promoted=!!(p.pgrade&&p.pdateD&&d>=p.pdateD);const bah0=(promoted&&+A.bahP>0)?+A.bahP:(+A.bah||0);
+    return {g:g,basic:basic,bas:_paBasBase(g)*Math.pow(1+basG,Math.max(0,d.getFullYear()-basYr)),bah:bah0*Math.pow(1+bahG,Math.max(0,jans))};};
+  const s0=at(today);
+  const cand=[];
+  for(let y=today.getFullYear()+1;y<=end.getFullYear();y++)cand.push({d:new Date(y,0,1),why:['January pay raise']});
+  for(let k=1;k<=45;k++){const d=new Date(p.pebdD.getFullYear()+k,p.pebdD.getMonth(),p.pebdD.getDate());if(d>today&&d<=end)cand.push({d:d,why:['Over '+k+' years of service']});}
+  if(p.pgrade&&p.pdateD&&p.pdateD>today&&p.pdateD<=end)cand.push({d:p.pdateD,why:['Promotion to '+_peGradeLbl(p.pgrade)]});
+  cand.sort((a,b)=>a.d-b.d);
+  const merged=[];cand.forEach(c=>{const l=merged[merged.length-1];if(l&&l.d.getTime()===c.d.getTime())l.why=l.why.concat(c.why);else merged.push({d:c.d,why:c.why.slice()});});
+  let last=base;
+  merged.forEach(c=>{
+    // evaluate just after the date: the engine's service clock counts 365.2425-day years, so an exact
+    // anniversary can read a day short of the new bracket; DFAS pays the new rate from the anniversary itself
+    const s=at(new Date(c.d.getTime()+2*864e5)),fica=(s.basic*12>SS_WAGE_BASE)?0.0145:0.0765;
+    const dNet=(s.basic-s0.basic)*(1-fed-fica)+(s.bas-s0.bas)+(s.bah-s0.bah);
+    const amt=Math.round((base+dNet)*100)/100;
+    if(Math.abs(amt-last)<0.5)return;                      // e.g. an anniversary that doesn't change the table
+    out.push({date:_pfISO(c.d),amount:amt,auto:true,why:c.why.join(' + '),basic:Math.round(s.basic*100)/100,grade:s.g,bah:Math.round(s.bah),bas:Math.round(s.bas*100)/100});
+    last=amt;
+  });
+  return out;
+}
+// Pure: civilian steps — take-home × (1 + raise) each January until the stop-working year.
+function _paCivCompute(base,A,today,stopYr){
+  const out=[],r=(+A.civG||0)/100;if(!(r>0)||!(base>0))return out;
+  for(let y=today.getFullYear()+1;y<(stopYr||today.getFullYear()+40);y++)out.push({date:y+'-01-01',amount:Math.round(base*Math.pow(1+r,y-today.getFullYear())*100)/100,auto:true,why:'January raise (+'+(+A.civG)+'%)'});
+  return out;
+}
+let _paC={key:null,steps:[],note:''};
+function _paKey(){return JSON.stringify([_pa(),typeof _isCiv==='function'&&_isCiv(),val('b-pay'),sval('rc-svc'),sval('rc-system'),typeof peState!=='undefined'?peState:null,ival('f-pyr'),_pfTodayISO(),(typeof REF_META!=='undefined'&&REF_META.milPay)?REF_META.milPay.effective:'',(typeof BAS_2026!=='undefined')?BAS_2026.officer:0]);}
+function _paSig(){return _paOn()?_paKey():'off';}
+function _paCompute(){
+  const k=_paKey();if(_paC.key===k)return _paC;
+  const A=_pa(),t=new Date(),today=new Date(t.getFullYear(),t.getMonth(),t.getDate()),base=val('b-pay');let steps=[],note='';
+  if(typeof _isCiv==='function'&&_isCiv()){steps=_paCivCompute(base,A,today,ival('f-pyr'));if(!steps.length)note='Set a yearly raise above 0%.';}
+  else if(typeof peReady==='function'&&peReady()){steps=_paMilCompute(_peParams(),base,A,today);if(!steps.length)note='No pay changes before your retirement date.';}
+  else note='Set your pay grade and active-duty service date on the Military Retirement tab.';
+  _paC={key:k,steps:steps,note:note};return _paC;
+}
+function _paSteps(){return _paCompute().steps;}
+
+// ── UI (inside Primary Take-Home → "Forecast future pay") ──
+function _paRecalc(){['calcBudget','calcFire','updateDash'].forEach(f=>{try{if(typeof window[f]==='function')window[f]();}catch(e){}});
+  try{if(typeof renderDebtCadence==='function')renderDebtCadence();}catch(e){}try{if(window.renderMissionControl)window.renderMissionControl();}catch(e){}
+  try{renderPayForecast('b-pay');}catch(e){}if(typeof scheduleAutoSave==='function')scheduleAutoSave();}
+function paSet(k,v){payAuto=Object.assign(_pa(),payAuto||{});payAuto[k]=(v===''||v==null)?null:+v;_paRecalc();}
+function paEnable(){
+  const man=(Array.isArray(payForecast['b-pay'])?payForecast['b-pay']:[]).filter(s=>s&&s.date);
+  if(man.length&&!window.confirm('Use the automatic pay forecast?\n\nYour '+man.length+' manual pay step'+(man.length>1?'s':'')+' ('+man.map(s=>_paD(s.date)+' '+fmtF(+s.amount||0)).join('; ')+') will be set aside, not deleted. They come back if you turn automatic off.'))return;
+  payAuto=Object.assign(_pa(),payAuto||{},{on:true});_paRecalc();
+  if(typeof toast==='function')toast('Automatic pay forecast on','var(--green)');
+}
+function paDisable(){payAuto=Object.assign(_pa(),payAuto||{},{on:false});_paRecalc();if(typeof toast==='function')toast('Back to your manual pay steps','var(--accent)');}
+function _paD(iso){const d=_parseDate(iso);return d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):iso;}
+function _paBox(){
+  const A=_pa(),civ=typeof _isCiv==='function'&&_isCiv(),on=_paOn(),cur=val('b-pay');
+  const prev=on?_paCompute():(function(){const s=payAuto;payAuto=Object.assign(_pa(),{on:true});_paC.key=null;const r=_paCompute();payAuto=s;_paC.key=null;return r;})();
+  const inp=(k,v,step,w,ph)=>'<input type="number" value="'+(v==null?'':v)+'" step="'+step+'" min="0" placeholder="'+(ph||'')+'" onchange="paSet(\''+k+'\',this.value)" style="width:'+w+'px;font-size:.62rem;padding:.15rem .3rem">';
+  const settings=civ
+    ?'<label>Yearly raise '+inp('civG',A.civG,0.5,56)+'%</label>'
+    :'<label title="Basic Allowance for Housing from your LES. Needed to grow BAH each January.">BAH now '+inp('bah',A.bah||'',25,76,'$/mo')+'</label>'+
+     '<label title="DoD average: +4.2% for 2026, +5.4% in 2024 and 2025">BAH yearly change '+inp('bahG',A.bahG,0.1,52)+'%</label>'+
+     (typeof peState!=='undefined'&&peState&&peState.pgrade?'<label title="BAH at your promoted grade (optional)">BAH after promotion '+inp('bahP',A.bahP||'',25,76,'$/mo')+'</label>':'')+
+     '<label title="Your federal tax bracket. FICA 7.65% is added automatically.">Federal bracket '+inp('fed',A.fed,1,48)+'%</label>'+
+     '<label title="0 if your state of legal residence has no income tax on military pay">State tax '+inp('st',A.st||0,0.5,48)+'%</label>';
+  const rows=prev.steps.slice(0,14).map(s=>{const d=s.amount-cur;return '<div class="pa-row"><span class="pa-d">'+_paD(s.date)+'</span><span class="pa-why">'+s.why+(s.basic?' <em>· basic '+fmtF(s.basic)+(s.bah?' · BAH '+fmtF(s.bah):'')+'</em>':'')+'</span><span class="pa-amt">'+fmtF(s.amount)+'<small style="color:'+(d>=0?'var(--green)':'var(--red)')+'">'+(d>=0?'+':'−')+fmtF(Math.abs(d))+'</small></span></div>';}).join('');
+  const more=prev.steps.length>14?'<div class="pa-more">+ '+(prev.steps.length-14)+' more steps through '+_paD(prev.steps[prev.steps.length-1].date)+'</div>':'';
+  const needBah=!civ&&!(+A.bah>0)?'<div class="pa-warn">Add your BAH from your LES so each January includes the housing increase. Without it, only basic pay and BAS grow.</div>':'';
+  return '<div class="pa-box'+(on?' on':'')+'">'+
+    '<div class="pa-hd"><b>'+(on?'✓ Automatic pay forecast':'Automatic pay forecast')+'</b><span>'+(civ?'your take-home grows each January':'from the official pay table · raises '+((_peRaise&&typeof peState!=='undefined')?(_peRaise(_peParams())*100).toFixed(2):'')+'%/yr · '+((+A.st>0)?'state tax '+(+A.st)+'%':'no state tax'))+'</span>'+
+      (on?'<button type="button" class="btn sm" onclick="paDisable()">Use manual steps</button>':'<button type="button" class="btn sm primary" onclick="paEnable()">Use automatic</button>')+'</div>'+
+    '<div class="pa-set">'+settings+'</div>'+needBah+
+    (prev.note&&!prev.steps.length?'<div class="pa-warn">'+prev.note+'</div>':'<div class="pa-list">'+(on?'':'<div class="pa-prev">Preview. Your plan still uses your manual steps below.</div>')+rows+more+'</div>')+
+  '</div>';
+}
+
 function pfLabelFor(id){
   if(typeof budgetLabels!=='undefined'&&budgetLabels[id])return budgetLabels[id];
   const inp=el(id),f=inp&&inp.closest?inp.closest('.field'):null,sp=f?f.querySelector('.bfx'):null;
@@ -9002,7 +9115,7 @@ function projInc(iso){return ledgerMonth(iso).totals.inc;}
 function projExp(iso){return ledgerMonth(iso).totals.out;}   // spending + savings + debt, as the Budget's "Total expenses"
 function projNet(iso){return projInc(iso)-projExp(iso);}
 // ── Per-stream forecast editor ──
-function pfToggle(id){const p=el('pf-panel-'+id);if(!p)return;const open=p.style.display!=='none';p.style.display=open?'none':'block';const c=el('pf-caret-'+id);if(c)c.textContent=open?'▸':'▾';}
+function pfToggle(id){const p=el('pf-panel-'+id);if(!p)return;if(id==='b-pay'&&p.style.display==='none'&&typeof _paBox==='function'){try{renderPayForecast('b-pay');}catch(e){}}const open=p.style.display!=='none';p.style.display=open?'none':'block';const c=el('pf-caret-'+id);if(c)c.textContent=open?'▸':'▾';}
 function pfAddStep(id){
   if(!Array.isArray(payForecast[id]))payForecast[id]=[];
   const d=new Date();d.setFullYear(d.getFullYear()+1);
@@ -9029,6 +9142,9 @@ function renderPayForecast(id){
       '<button type="button" class="bx-del" title="Remove" onclick="pfDelStep(\''+id+'\','+i+')">&times;</button>'+
     '</div>';
   }).join('');
+  if(id==='b-pay'&&typeof _paBox==='function'){const on=_paOn(),n=steps.length;
+    html=_paBox()+(on?(n?'<div class="pa-man">'+n+' manual step'+(n>1?'s':'')+' set aside while automatic is on.</div>':''):html);
+    const ab=wrap.parentNode&&wrap.parentNode.querySelector('.pf-add');if(ab)ab.style.display=on?'none':'';}
   wrap.innerHTML=html;
 }
 function initPayForecastUI(){
@@ -12177,7 +12293,7 @@ window.addEventListener('resize',()=>{
 // ═══════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════
-var __tfKeep=(typeof singleUserBoot==='function')?singleUserBoot():null;if(!__tfKeep)setTimeout(function(){if(typeof obOpen==='function'&&!currentClientId)obOpen();},60);  // single-user: cleanup to one slot + auto-restore saved data on open
+var __tfKeep=(typeof singleUserBoot==='function')?singleUserBoot():null;if(!__tfKeep){window.__tfSetup=true;var __tfGo=function(){if(typeof obOpen==='function'&&!currentClientId)obOpen();else window.__tfSetup=false;};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',__tfGo);else setTimeout(__tfGo,0);}  // single-user: cleanup to one slot + auto-restore saved data on open
 if(typeof refreshClientSelect==='function')refreshClientSelect();
 if(typeof syncMortgageFromSlider==='function')syncMortgageFromSlider();
 if(typeof calcFire==='function')calcFire();
@@ -12297,6 +12413,13 @@ function _icKnownAnswer(){
   try{var bc=_obBlankState({type:'civilian',stop:CY+20,dob:'1990-01-01'}),bm=_obBlankState({type:'military',branch:'Army',grade:'E6',pebd:'2015-05-01',ret:(CY+9)+'-05',sys:'brs',dob:'1995-02-02'});
     var z=['tsp','liq','pension','va','a_401','a_roth','a_oth','a_brk'].every(function(k){return bc[k]===0&&bm[k]===0;})&&!bc.debts.length&&!bc.purchases.length;
     add('A new plan starts from zero, set to the person’s own profile',z&&bc.profile.type==='civilian'&&bc.pyr===CY+20&&bm.profile.branch==='Army'&&bm.rc_svc==='2015-05-01'&&bm.peState.grade==='E6','both kinds of new plan checked: balances $0, no debts, own dates');}catch(e){add('New plan setup',false,e.message);}
+  try{var pp=_peParams({grade:'O3',pgrade:'O4',pdate:'2028-06-01',pebd:'2016-05-01',ret:'2036-04',g:0.034,tableYear:2026,infl:0.025});
+    var t0=new Date(2026,9,1),PA={bah:3000,bahG:4.2,fed:22},st=_paMilCompute(pp,8000,PA,t0),byD={};st.forEach(function(x){byD[x.date]=x;});
+    var bB=peBasicNom(t0,pp),bJ=peBasicNom(new Date(2027,0,1),pp),basO=_paBasBase('O3'),basY=+(((REF_META.bas&&REF_META.bas.effective)||'2026')).slice(0,4);
+    var expJ=Math.round((8000+(bJ-bB)*(1-0.22-0.0765)+basO*(Math.pow(1.024,2027-basY)-Math.pow(1.024,Math.max(0,2026-basY)))+3000*0.042)*100)/100;
+    var cv=_paCivCompute(5000,{civG:3},t0,2030);
+    add('Automatic pay forecast follows the pay table',!!byD['2027-01-01']&&Math.abs(byD['2027-01-01'].amount-expJ)<0.02&&!!byD['2028-05-01']&&!!byD['2028-06-01']&&/Promotion to O-4/.test(byD['2028-06-01'].why)&&st[st.length-1].date<='2036-04-30'&&cv.length===3&&cv[0].amount===5150&&cv[0].date==='2027-01-01',
+      'O-3, service from May 2016, O-4 Jun 2028: Jan 2027 take-home '+fmtF(expJ)+' (raise after 22% + FICA, BAS, BAH +4.2%); longevity step May 2028; civilian $5,000 at 3% → $5,150 Jan 2027');}catch(e){add('Automatic pay forecast',false,e.message);}
   // Promo deadline: paid ON the deadline day = beaten, $0 retro. Balance left = retro on what's left.
   try{
     var dl=new Date(today.getFullYear(),today.getMonth()+2,1), dls=String(dl.getMonth()+1).padStart(2,'0')+'/'+dl.getFullYear();
@@ -12648,7 +12771,7 @@ var _dsQC={};
 function _dsQuick(p){
   if(!p||p.type!=='expense'||p.approved)return null;
   const B=_dsBase(true);
-  const key=JSON.stringify([p.name,p.amount,p.year,p.date,p.bsMode,p.bsRate,p.bsTerm,p.bsDown,p.fees,p.ownMo,p.resale,(typeof _snowSig==='function'?_snowSig():''),val('dt-extra'),Math.round(B.net),Math.round(B.inc),B.cash,Math.round(B.essMo),Math.round((B.fi||0)*3650)]);   // date rounded: it moves with the clock
+  const key=JSON.stringify([p.name,p.amount,p.year,p.date,p.bsMode,p.bsRate,p.bsTerm,p.bsDown,p.fees,p.ownMo,p.resale,(typeof _snowSig==='function'?_snowSig():''),(typeof _paSig==='function'?_paSig():''),val('dt-extra'),Math.round(B.net),Math.round(B.inc),B.cash,Math.round(B.essMo),Math.round((B.fi||0)*3650)]);   // date rounded: it moves with the clock
   const c=_dsQC[p.id];if(c&&c.key===key)return c.res;
   const O=_dsOptions(p),E=O.map(o=>_dsEval(o,B,false));
   const f=E.find(r=>r.key==='fin');
@@ -13059,6 +13182,7 @@ function applyProfile(){
   if(civ){const t=el('tab-milret');if(t&&t.classList.contains('active')){try{switchTab('dash');}catch(e){}}}
   const pb=el('profile-btn');if(pb)pb.title=civ?'Your profile: civilian':'Your profile: military · '+B;
   try{_gsRender();}catch(e){}try{_sampleBanner();}catch(e){}
+  try{if(typeof renderPayForecast==='function')renderPayForecast('b-pay');}catch(e){}   // pay forecast wording follows the profile
 }
 
 // ── small helpers ──
@@ -13152,7 +13276,7 @@ function _obBlankState(o){
     peState:civ?null:{grade:o.grade||'E5',pgrade:'',pdate:'',ret:o.ret||'',rwin:10,rcustom:null},
     fpHistory:{monthly:[],daily:[]},fpGoals:[],portfolio:[],tspFunds:{},budgetItems:{},deletedBudget:[],deletedCards:[],collapsedCards:[],budgetLabels:{},expClass:{},customCats:[],layout:{},tabUI:{},
     rc_svc:civ?'':(o.pebd||''),rc_system:civ?'high3':(o.sys||'brs'),rc_y1:civ?'':(o.ret||''),rc_y2:'',rc_y3:'',
-    budget:{pay:+o.pay||0},mil:civ?{}:{grade:o.grade||'E5'}};
+    budget:{pay:+o.pay||0},mil:civ?{}:{grade:o.grade||'E5'},payAuto:{on:true}};
 }
 // Set a value the same way the app's own controls do (range + its number twin), widening the range if needed.
 function _obSetV(id,v){const e=el(id);if(!e)return;if(e.max!==''&&+e.max<v)e.max=v;if(e.min!==''&&+e.min>v)e.min=v;e.value=v;const n=el(id+'-n');if(n){if(n.max!==''&&+n.max<v)n.max=v;n.value=v;}}
@@ -13182,7 +13306,7 @@ function obCreate(){
   }
   const name=(o.name||'').trim()||'My Plan';
   const clients={};clients[SINGLE_CLIENT_ID]={name:name,state:_obBlankState(o),savedAt:Date.now()};
-  saveClients(clients);currentClientId=SINGLE_CLIENT_ID;_OB.open=false;
+  saveClients(clients);currentClientId=SINGLE_CLIENT_ID;_OB.open=false;window.__tfSetup=false;
   const pyr=clients[SINGLE_CLIENT_ID].state.pyr;const fp=el('f-pyr');if(fp&&+fp.max<pyr)fp.max=pyr;
   loadClient(SINGLE_CLIENT_ID,true);applyProfile();
   let note='';
@@ -13199,7 +13323,7 @@ function obRestore(evt){
   try{importBackup(evt);}catch(e){toast('Restore failed: '+e.message,'var(--red)');}
   const ov=el('ob-ov');if(ov)ov.style.display='none';
   setTimeout(function(){const ok=currentClientId&&getClients()[currentClientId];
-    if(ok){obClose();applyProfile();}else{if(ov)ov.style.display='';}},1200);
+    if(ok){window.__tfSetup=false;obClose();applyProfile();}else{if(ov)ov.style.display='';}},1200);
 }
 
 // ── Sample plans: fictional, clearly labeled, and removed when you start your own ──
@@ -13209,7 +13333,7 @@ function _obSample(kind){
     const o={type:'military',branch:'Army',grade:'E7',pebd:ymd(y-16,6,1),ret:ymd(y+4,6,1).slice(0,7),sys:'high3',dob:ymd(y-36,3,14),pay:7100,spend:0};
     const st=_obBlankState(o);st.gs=null;st.sample=true;
     Object.assign(st,{a_tsp:86000,tsp:86000,a_tsp_c:600,a_roth:24000,a_rothc:300,a_brk:7500,a_brkc:150,a_oth:11000,a_othn:'Emergency fund',
-      va:30,vastatus:'spouse',retire:66000,ss:2100,ss_age:67,bridge:58000,bridge_save:400,hc:0});
+      va:30,vastatus:'spouse',retire:66000,ss:2100,ss_age:67,bridge:58000,bridge_save:400,hc:0,payAuto:{on:true,bah:2100}});
     st.budget={pay:7100,pay2:2800,rent:2100,elec:160,gas:60,internet:75,phone:130,water:55,groc:1050,dining:280,fuel:240,autoins:170,stream:45,ent:150,clothing:100,misc:200,emerg:250,invest:150,debtpmt:570};
     st.debts=[{id:1,name:'Auto loan',balance:21000,apr:5.9,minpmt:460,term:48,type:'auto',dueday:15,opendate:mo,payments:[],autopay:true,inPlan:true},
               {id:2,name:'Credit card',balance:3800,apr:21.9,minpmt:110,term:0,type:'credit_card',dueday:3,opendate:mo,payments:[],autopay:true,inPlan:true}];
@@ -13229,7 +13353,7 @@ function _obSample(kind){
 function obLoadSample(kind){
   const S=_obSample(kind);
   const clients={};clients[SINGLE_CLIENT_ID]={name:S.name,state:S.state,savedAt:Date.now()};
-  saveClients(clients);currentClientId=SINGLE_CLIENT_ID;obClose();
+  saveClients(clients);currentClientId=SINGLE_CLIENT_ID;window.__tfSetup=false;obClose();
   loadClient(SINGLE_CLIENT_ID,true);applyProfile();
   if(kind==='military')_obMilPension();
   _obRecalc();persistNow();try{switchTab('dash');}catch(e){}
