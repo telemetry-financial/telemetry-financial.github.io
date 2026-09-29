@@ -1514,6 +1514,14 @@ html.ob-lock,html.ob-lock body{overflow:hidden!important}
 .pa-warn{font-size:.52rem;color:var(--orange);margin:.3rem 0;line-height:1.45}
 .pa-prev,.pa-more,.pa-man{font-size:.5rem;color:var(--muted);margin:.2rem 0}
 @media(max-width:560px){.pa-row{grid-template-columns:68px minmax(0,1fr) auto}}
+.pa-now .pa-why{color:var(--muted)}
+.pa-sp{margin:.2rem 0 .45rem;padding:.4rem .5rem;border:1px dashed var(--border);border-radius:8px}
+.pa-sp-hd{font-size:.56rem;font-weight:600;color:var(--text);margin-bottom:.25rem}.pa-sp-hd span{font-weight:400;color:var(--muted)}
+.pa-sp-row{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem .6rem;font-size:.54rem;color:var(--muted);padding:.2rem 0}
+.pa-sp-row label{display:flex;align-items:center;gap:.2rem;white-space:nowrap}
+.pa-sp-row input{font-size:.6rem;padding:.12rem .3rem;width:auto}.pa-sp-n{width:130px!important}.pa-sp-a{width:72px!important}
+.pa-sp-add{font-size:.58rem;padding:.15rem .3rem;width:auto;margin-top:.2rem}
+.pa-incl{font-size:.52rem;color:var(--muted);margin:.25rem 0 .1rem;line-height:1.45}.pa-incl span{opacity:.8}
 </style>
 </head>
 <body>
@@ -8888,24 +8896,31 @@ function incValAsOf(id){return fieldValAsOf(id);}   // back-compat alias
 // already drops primary pay from the pension year). Manual pay steps are kept and come back if the
 // automatic forecast is turned off.
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-const PA_DEF={bahG:4.2,basG:2.4,fed:22,civG:3};   // BAH: DoD 2026 average +4.2% (2024–25: +5.4%) · BAS 2025→2026 +2.4% · 22% federal bracket
+const PA_DEF={bahG:4.2,basG:0,fed:22,civG:3};     // BAH: DoD 2026 average +4.2% (2024–25: +5.4%) · BAS held flat unless you set a yearly change (2025→2026 was +2.4%) · 22% federal bracket
 const SS_WAGE_BASE=184500;                          // 2026 Social Security taxable maximum (ssa.gov)
-function _pa(){return Object.assign({on:false,bah:0,bahG:PA_DEF.bahG,bahP:null,fed:PA_DEF.fed,st:0,civG:PA_DEF.civG},(typeof payAuto!=='undefined'&&payAuto)||{});}
+function _pa(){return Object.assign({on:false,bah:0,bahG:PA_DEF.bahG,basG:PA_DEF.basG,bahP:null,fed:PA_DEF.fed,st:0,civG:PA_DEF.civG,sp:[]},(typeof payAuto!=='undefined'&&payAuto)||{});}
 function _paOn(){return !!(typeof payAuto!=='undefined'&&payAuto&&payAuto.on);}
+// Special & incentive pays (submarine, sea, flight, dive…): {n,a,cd,ca,end} = name, $/mo now, changes on cd to ca, ends on end.
+// They don't grow with the annual raise; they change only on the dates you enter. Taxed like basic pay but without FICA
+// (military Social Security/Medicare is withheld on basic pay only).
+function _paSpAt(sp,d){const iso=_pfISO(d);return (sp||[]).reduce((t,x)=>{if(!x)return t;if(x.end&&iso>=x.end)return t;return t+((x.cd&&iso>=x.cd&&x.ca!=null&&x.ca!=='')?(+x.ca||0):(+x.a||0));},0);}
 function _paBasBase(grade){const B=(typeof BAS_2026!=='undefined')?BAS_2026:{enlisted:0,officer:0};return /^E/.test(grade||'')?B.enlisted:B.officer;}
 // Pure: steps for a military member. p = _peParams(...), base = today's take-home, A = settings, today = Date.
 function _paMilCompute(p,base,A,today){
   const out=[];const end=p.retD;if(!p.pebdD||!end||!(end>today))return out;
-  const fed=((+A.fed||0)+(+A.st||0))/100,bahG=(+A.bahG||0)/100,basG=PA_DEF.basG/100;
+  const fed=((+A.fed||0)+(+A.st||0))/100,bahG=(+A.bahG||0)/100,basG=(+A.basG||0)/100;
   const basYr=+(((typeof REF_META!=='undefined'&&REF_META.bas&&REF_META.bas.effective)||'2026')).slice(0,4);
   const at=d=>{const g=peGradeAt(d,p),basic=peBasicNom(d,p),jans=d.getFullYear()-today.getFullYear();
     const promoted=!!(p.pgrade&&p.pdateD&&d>=p.pdateD);const bah0=(promoted&&+A.bahP>0)?+A.bahP:(+A.bah||0);
-    return {g:g,basic:basic,bas:_paBasBase(g)*Math.pow(1+basG,Math.max(0,d.getFullYear()-basYr)),bah:bah0*Math.pow(1+bahG,Math.max(0,jans))};};
+    return {g:g,basic:basic,bas:_paBasBase(g)*Math.pow(1+basG,Math.max(0,d.getFullYear()-basYr)),bah:bah0*Math.pow(1+bahG,Math.max(0,jans)),sp:_paSpAt(A.sp,d)};};
   const s0=at(today);
   const cand=[];
   for(let y=today.getFullYear()+1;y<=end.getFullYear();y++)cand.push({d:new Date(y,0,1),why:['January pay raise']});
   for(let k=1;k<=45;k++){const d=new Date(p.pebdD.getFullYear()+k,p.pebdD.getMonth(),p.pebdD.getDate());if(d>today&&d<=end)cand.push({d:d,why:['Over '+k+' years of service']});}
   if(p.pgrade&&p.pdateD&&p.pdateD>today&&p.pdateD<=end)cand.push({d:p.pdateD,why:['Promotion to '+_peGradeLbl(p.pgrade)]});
+  (A.sp||[]).forEach(x=>{if(!x)return;const nm=x.n||'Special pay';
+    const cd=x.cd&&_parseDate(x.cd);if(cd&&cd>today&&cd<=end)cand.push({d:cd,why:[nm+' changes']});
+    const ed=x.end&&_parseDate(x.end);if(ed&&ed>today&&ed<=end)cand.push({d:ed,why:[nm+' ends']});});
   cand.sort((a,b)=>a.d-b.d);
   const merged=[];cand.forEach(c=>{const l=merged[merged.length-1];if(l&&l.d.getTime()===c.d.getTime())l.why=l.why.concat(c.why);else merged.push({d:c.d,why:c.why.slice()});});
   let last=base;
@@ -8913,10 +8928,10 @@ function _paMilCompute(p,base,A,today){
     // evaluate just after the date: the engine's service clock counts 365.2425-day years, so an exact
     // anniversary can read a day short of the new bracket; DFAS pays the new rate from the anniversary itself
     const s=at(new Date(c.d.getTime()+2*864e5)),fica=(s.basic*12>SS_WAGE_BASE)?0.0145:0.0765;
-    const dNet=(s.basic-s0.basic)*(1-fed-fica)+(s.bas-s0.bas)+(s.bah-s0.bah);
+    const dNet=(s.basic-s0.basic)*(1-fed-fica)+(s.sp-s0.sp)*(1-fed)+(s.bas-s0.bas)+(s.bah-s0.bah);
     const amt=Math.round((base+dNet)*100)/100;
     if(Math.abs(amt-last)<0.5)return;                      // e.g. an anniversary that doesn't change the table
-    out.push({date:_pfISO(c.d),amount:amt,auto:true,why:c.why.join(' + '),basic:Math.round(s.basic*100)/100,grade:s.g,bah:Math.round(s.bah),bas:Math.round(s.bas*100)/100});
+    out.push({date:_pfISO(c.d),amount:amt,auto:true,why:c.why.join(' + '),basic:Math.round(s.basic*100)/100,grade:s.g,bah:Math.round(s.bah),bas:Math.round(s.bas*100)/100,sp:Math.round(s.sp*100)/100});
     last=amt;
   });
   return out;
@@ -8952,8 +8967,23 @@ function paEnable(){
   if(typeof toast==='function')toast('Automatic pay forecast on','var(--green)');
 }
 function paDisable(){payAuto=Object.assign(_pa(),payAuto||{},{on:false});_paRecalc();if(typeof toast==='function')toast('Back to your manual pay steps','var(--accent)');}
+function paSpAdd(n){payAuto=Object.assign(_pa(),payAuto||{});payAuto.sp=(payAuto.sp||[]).concat([{n:n,a:0,cd:'',ca:null,end:''}]);_paRecalc();}
+function paSpSet(i,k,v){payAuto=Object.assign(_pa(),payAuto||{});const x=(payAuto.sp||[])[i];if(!x)return;x[k]=(k==='n'||k==='cd'||k==='end')?String(v||''):(v===''?null:+v);_paRecalc();}
+function paSpDel(i){payAuto=Object.assign(_pa(),payAuto||{});(payAuto.sp||[]).splice(i,1);_paRecalc();}
+function _paEsc(t){return String(t==null?'':t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+// What today's take-home is made of (for the explanation row).
+function _paNow(A){try{if(!(typeof peReady==='function'&&peReady()))return null;const p=_peParams(),t=new Date(),d=new Date(t.getFullYear(),t.getMonth(),t.getDate()),g=peGradeAt(d,p);
+  return {basic:peBasicNom(d,p),bas:_paBasBase(g),bah:+A.bah||0,sp:(A.sp||[]).filter(x=>x&&!(x.end&&_pfISO(d)>=x.end)).map(x=>[x.n||'Special pay',(x.cd&&_pfISO(d)>=x.cd&&x.ca!=null)?+x.ca:(+x.a||0)])};}catch(e){return null;}}
 function _paD(iso){const d=_parseDate(iso);return d?d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):iso;}
+function _paIncl(){try{
+  const inp=el('b-pay'),f=inp&&inp.closest?inp.closest('.field'):null;if(!f)return;
+  let c=f.querySelector('.pa-incl');if(!c){c=document.createElement('div');c.className='pa-incl';const pb=f.querySelector('.pf-block');f.insertBefore(c,pb||null);}
+  const A=_pa(),N=(typeof _isCiv==='function'&&_isCiv())?null:_paNow(A);
+  if(!N||!(N.bah>0||N.sp.length)){c.style.display='none';c.textContent='';return;}
+  c.innerHTML='Includes basic '+fmtF(N.basic)+' · BAS '+fmtF(N.bas)+(N.bah?' · BAH '+fmtF(N.bah):'')+N.sp.map(x=>' · '+_paEsc(x[0])+' '+fmtF(x[1])).join('')+' <span>(before tax)</span>';c.style.display='block';
+}catch(e){}}
 function _paBox(){
+  setTimeout(_paIncl,0);
   const A=_pa(),civ=typeof _isCiv==='function'&&_isCiv(),on=_paOn(),cur=val('b-pay');
   const prev=on?_paCompute():(function(){const s=payAuto;payAuto=Object.assign(_pa(),{on:true});_paC.key=null;const r=_paCompute();payAuto=s;_paC.key=null;return r;})();
   const inp=(k,v,step,w,ph)=>'<input type="number" value="'+(v==null?'':v)+'" step="'+step+'" min="0" placeholder="'+(ph||'')+'" onchange="paSet(\''+k+'\',this.value)" style="width:'+w+'px;font-size:.62rem;padding:.15rem .3rem">';
@@ -8962,16 +8992,28 @@ function _paBox(){
     :'<label title="Basic Allowance for Housing from your LES. Needed to grow BAH each January.">BAH now '+inp('bah',A.bah||'',25,76,'$/mo')+'</label>'+
      '<label title="DoD average: +4.2% for 2026, +5.4% in 2024 and 2025">BAH yearly change '+inp('bahG',A.bahG,0.1,52)+'%</label>'+
      (typeof peState!=='undefined'&&peState&&peState.pgrade?'<label title="BAH at your promoted grade (optional)">BAH after promotion '+inp('bahP',A.bahP||'',25,76,'$/mo')+'</label>':'')+
+     '<label title="BAS rises most Januarys (2026: +2.4%). Leave at 0 to hold it flat.">BAS yearly change '+inp('basG',A.basG||0,0.1,48)+'%</label>'+
      '<label title="Your federal tax bracket. FICA 7.65% is added automatically.">Federal bracket '+inp('fed',A.fed,1,48)+'%</label>'+
      '<label title="0 if your state of legal residence has no income tax on military pay">State tax '+inp('st',A.st||0,0.5,48)+'%</label>';
-  const rows=prev.steps.slice(0,14).map(s=>{const d=s.amount-cur;return '<div class="pa-row"><span class="pa-d">'+_paD(s.date)+'</span><span class="pa-why">'+s.why+(s.basic?' <em>· basic '+fmtF(s.basic)+(s.bah?' · BAH '+fmtF(s.bah):'')+'</em>':'')+'</span><span class="pa-amt">'+fmtF(s.amount)+'<small style="color:'+(d>=0?'var(--green)':'var(--red)')+'">'+(d>=0?'+':'−')+fmtF(Math.abs(d))+'</small></span></div>';}).join('');
+  const parts=s=>' <em>· basic '+fmtF(s.basic)+' · BAS '+fmtF(s.bas)+(s.bah?' · BAH '+fmtF(s.bah):'')+(s.sp?' · special pays '+fmtF(s.sp):'')+'</em>';
+  const N=civ?null:_paNow(A);
+  const nowRow=N?'<div class="pa-row pa-now"><span class="pa-d">Today</span><span class="pa-why">Your take-home already includes <em>basic '+fmtF(N.basic)+' · BAS '+fmtF(N.bas)+(N.bah?' · BAH '+fmtF(N.bah):'')+N.sp.map(x=>' · '+_paEsc(x[0])+' '+fmtF(x[1])).join('')+'</em> (before tax and deductions). Each step adds only what changes, after tax.</span><span class="pa-amt">'+fmtF(cur)+'</span></div>':'';
+  const spEd=civ?'':'<div class="pa-sp"><div class="pa-sp-hd">Special &amp; incentive pays in your take-home <span>(not raised each January; they change only on dates you set. Taxed without FICA.)</span></div>'+
+    (A.sp||[]).map((x,i)=>'<div class="pa-sp-row"><input type="text" value="'+_paEsc(x.n)+'" onchange="paSpSet('+i+',\'n\',this.value)" class="pa-sp-n">'+
+      '<label>$<input type="number" min="0" step="5" value="'+(x.a!=null?x.a:'')+'" onchange="paSpSet('+i+',\'a\',this.value)" class="pa-sp-a">/mo</label>'+
+      '<label>changes on <input type="date" value="'+(x.cd||'')+'" onchange="paSpSet('+i+',\'cd\',this.value)"></label>'+
+      '<label>to $<input type="number" min="0" step="5" value="'+(x.ca!=null?x.ca:'')+'" onchange="paSpSet('+i+',\'ca\',this.value)" class="pa-sp-a"></label>'+
+      '<label>ends <input type="date" value="'+(x.end||'')+'" onchange="paSpSet('+i+',\'end\',this.value)"></label>'+
+      '<button type="button" class="bx-del" title="Remove" onclick="paSpDel('+i+')">&times;</button></div>').join('')+
+    '<select class="pa-sp-add" onchange="if(this.value){paSpAdd(this.value);this.value=\'\';}"><option value="">+ Add a special pay…</option><option>Submarine pay</option><option>Career sea pay</option><option>Sea pay premium</option><option>Flight pay</option><option>Dive pay</option><option>Hazardous duty pay</option><option>Other special pay</option></select></div>';
+  const rows=prev.steps.slice(0,14).map(s=>{const d=s.amount-cur;return '<div class="pa-row"><span class="pa-d">'+_paD(s.date)+'</span><span class="pa-why">'+s.why+(s.basic?parts(s):'')+'</span><span class="pa-amt">'+fmtF(s.amount)+'<small style="color:'+(d>=0?'var(--green)':'var(--red)')+'">'+(d>=0?'+':'−')+fmtF(Math.abs(d))+'</small></span></div>';}).join('');
   const more=prev.steps.length>14?'<div class="pa-more">+ '+(prev.steps.length-14)+' more steps through '+_paD(prev.steps[prev.steps.length-1].date)+'</div>':'';
   const needBah=!civ&&!(+A.bah>0)?'<div class="pa-warn">Add your BAH from your LES so each January includes the housing increase. Without it, only basic pay and BAS grow.</div>':'';
   return '<div class="pa-box'+(on?' on':'')+'">'+
     '<div class="pa-hd"><b>'+(on?'✓ Automatic pay forecast':'Automatic pay forecast')+'</b><span>'+(civ?'your take-home grows each January':'from the official pay table · raises '+((_peRaise&&typeof peState!=='undefined')?(_peRaise(_peParams())*100).toFixed(2):'')+'%/yr · '+((+A.st>0)?'state tax '+(+A.st)+'%':'no state tax'))+'</span>'+
       (on?'<button type="button" class="btn sm" onclick="paDisable()">Use manual steps</button>':'<button type="button" class="btn sm primary" onclick="paEnable()">Use automatic</button>')+'</div>'+
-    '<div class="pa-set">'+settings+'</div>'+needBah+
-    (prev.note&&!prev.steps.length?'<div class="pa-warn">'+prev.note+'</div>':'<div class="pa-list">'+(on?'':'<div class="pa-prev">Preview. Your plan still uses your manual steps below.</div>')+rows+more+'</div>')+
+    '<div class="pa-set">'+settings+'</div>'+spEd+needBah+
+    (prev.note&&!prev.steps.length?'<div class="pa-warn">'+prev.note+'</div>':'<div class="pa-list">'+(on?'':'<div class="pa-prev">Preview. Your plan still uses your manual steps below.</div>')+nowRow+rows+more+'</div>')+
   '</div>';
 }
 
@@ -12416,10 +12458,15 @@ function _icKnownAnswer(){
   try{var pp=_peParams({grade:'O3',pgrade:'O4',pdate:'2028-06-01',pebd:'2016-05-01',ret:'2036-04',g:0.034,tableYear:2026,infl:0.025});
     var t0=new Date(2026,9,1),PA={bah:3000,bahG:4.2,fed:22},st=_paMilCompute(pp,8000,PA,t0),byD={};st.forEach(function(x){byD[x.date]=x;});
     var bB=peBasicNom(t0,pp),bJ=peBasicNom(new Date(2027,0,1),pp),basO=_paBasBase('O3'),basY=+(((REF_META.bas&&REF_META.bas.effective)||'2026')).slice(0,4);
-    var expJ=Math.round((8000+(bJ-bB)*(1-0.22-0.0765)+basO*(Math.pow(1.024,2027-basY)-Math.pow(1.024,Math.max(0,2026-basY)))+3000*0.042)*100)/100;
+    var expJ=Math.round((8000+(bJ-bB)*(1-0.22-0.0765)+3000*0.042)*100)/100;
     var cv=_paCivCompute(5000,{civG:3},t0,2030);
     add('Automatic pay forecast follows the pay table',!!byD['2027-01-01']&&Math.abs(byD['2027-01-01'].amount-expJ)<0.02&&!!byD['2028-05-01']&&!!byD['2028-06-01']&&/Promotion to O-4/.test(byD['2028-06-01'].why)&&st[st.length-1].date<='2036-04-30'&&cv.length===3&&cv[0].amount===5150&&cv[0].date==='2027-01-01',
-      'O-3, service from May 2016, O-4 Jun 2028: Jan 2027 take-home '+fmtF(expJ)+' (raise after 22% + FICA, BAS, BAH +4.2%); longevity step May 2028; civilian $5,000 at 3% → $5,150 Jan 2027');}catch(e){add('Automatic pay forecast',false,e.message);}
+      'O-3, service from May 2016, O-4 Jun 2028: Jan 2027 take-home '+fmtF(expJ)+' (raise after 22% + FICA, BAH +4.2%, BAS flat); longevity step May 2028; civilian $5,000 at 3% → $5,150 Jan 2027');}catch(e){add('Automatic pay forecast',false,e.message);}
+  try{var pq=_peParams({grade:'O3E',pgrade:'',pdate:'',pebd:'2008-10-01',ret:'2030-09',g:0.034,tableYear:2026,infl:0.025});var q0=new Date(2026,9,1);
+    var noSp=_paMilCompute(pq,10000,{bah:0,bahG:4.2,fed:22,st:0,sp:[]},q0),wSp=_paMilCompute(pq,10000,{bah:0,bahG:4.2,fed:22,st:0,sp:[{n:'Submarine pay',a:400,cd:'2028-03-01',ca:600,end:'2030-06-01'}]},q0);
+    var f=function(a,d){var v=null;a.forEach(function(x){if(x.date<=d)v=x.amount;});return v==null?10000:v;};
+    var dMar=f(wSp,'2028-03-01')-f(noSp,'2028-03-01'),dJun=f(wSp,'2030-06-01')-f(noSp,'2030-06-01'),dNow=f(wSp,'2027-06-01')-f(noSp,'2027-06-01');
+    add('Special pays change only on their dates (taxed without FICA)',Math.abs(dNow)<0.01&&Math.abs(dMar-200*0.78)<0.02&&Math.abs(dJun+400*0.78)<0.02,'Submarine pay $400 → $600 Mar 2028 adds '+fmtF(dMar)+'/mo after 22% tax; ending Jun 2030 removes '+fmtF(-dJun)+'/mo; no change before Mar 2028');}catch(e){add('Special pays',false,e.message);}
   // Promo deadline: paid ON the deadline day = beaten, $0 retro. Balance left = retro on what's left.
   try{
     var dl=new Date(today.getFullYear(),today.getMonth()+2,1), dls=String(dl.getMonth()+1).padStart(2,'0')+'/'+dl.getFullYear();
@@ -12512,7 +12559,7 @@ function assumptionRegistry(){
 function runIntegrity(full){
   // Plan checks run every time; the known-answer math tests (heavier) run on load, on open, and on "Run again".
   var R=[];try{R=R.concat(_icDataChecks());}catch(e){}if(full!==false||!_IC.math){try{_IC.math=_icKnownAnswer();}catch(e){_IC.math=[];}}R=R.concat(_IC.math||[]);
-  if(typeof _isCiv==='function'&&_isCiv())R=R.filter(function(r){return !/Military|military|[Pp]ension|\bVA\b|BAS|pay table|[Pp]ay raise/.test(r.n||'');});
+  if(typeof _isCiv==='function'&&_isCiv())R=R.filter(function(r){return !/Military|military|[Pp]ension|\bVA\b|BAS|pay table|[Pp]ay raise|Special pays/.test(r.n||'');});
   _IC.res=R;
   var f=R.filter(function(r){return r.s==='fail';}).length,w=R.filter(function(r){return r.s==='warn';}).length;
   var dot=document.getElementById('integrity-dot');if(dot)dot.style.background=f?'var(--red)':(w?'var(--orange)':'var(--green)');
