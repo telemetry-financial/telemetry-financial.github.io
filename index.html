@@ -1424,7 +1424,7 @@ input[type="range"]{background:rgba(31,35,48,.10)!important;}
 .pe-card{border:1.5px solid color-mix(in srgb,var(--accent) 45%,var(--border))!important}
 .pe-top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.7rem}.pe-eye{font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700}
 .pe-title{font-family:'DM Serif Display',serif;font-size:1.3rem}.pe-src{font-size:.52rem;color:var(--muted);text-align:right}
-.pe-in{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin-bottom:.7rem}.pe-in input[type=month]{width:100%;box-sizing:border-box;padding:.42rem .52rem;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-family:'DM Mono',monospace;font-size:.74rem;color-scheme:light dark}
+.pe-in{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.6rem;margin-bottom:.7rem}.pe-in input[type=month],.pe-in input[type=date]{width:100%;box-sizing:border-box;padding:.42rem .52rem;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-family:'DM Mono',monospace;font-size:.74rem;color-scheme:light dark}
 .pe-now{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;margin-bottom:.7rem}.pe-now>div{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:.6rem .75rem}
 .pe-now span{display:block;font-size:.5rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}.pe-now b{display:block;font-size:.72rem;margin:.15rem 0}.pe-now small{font-size:.56rem;color:var(--muted)}
 .pe-pen{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:1rem;align-items:center;margin-bottom:.4rem}.pe-pair{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}.pe-v2{color:var(--text)!important}
@@ -2013,14 +2013,10 @@ html.ob-lock,html.ob-lock body{overflow:hidden!important}
         <div class="field"><label>Promotion date</label><input type="month" id="pe-pdate" oninput="peChanged()"></div>
         <div class="field"><label>Retire from the Navy</label><input type="month" id="pe-ret" oninput="peChanged()"></div>
       </div>
-      <div class="pe-in pe-in2"><div class="field" style="grid-column:span 2"><label>Future pay raises</label><select id="pe-rwin" onchange="peChanged()"><option value="5"></option><option value="10"></option><option value="15"></option><option value="20"></option><option value="custom">Custom rate</option></select></div><div class="field"><label>&nbsp;</label><input type="number" id="pe-rcustom" step="0.1" min="0" max="10" placeholder="% per year" oninput="peChanged()" style="display:none"></div></div>
+      <div class="pe-in pe-in2"><div class="field"><label>Active-Duty Service Date</label><input type="date" id="rc-svc" value="2012-06-01" oninput="Dq('calcRetireCompare');if(typeof peChanged==='function')peChanged()"></div><div class="field"><label>Retirement System</label><select id="rc-system" onchange="updateBrsDisplay();calcRetireCompare();if(window.renderMission)window.renderMission();if(typeof peChanged==='function')peChanged()"><option value="high3">High-3 — 2.5%/yr (50% at 20 yrs)</option><option value="brs">Blended (BRS) — 2.0%/yr (40% at 20 yrs)</option></select></div><div class="field"><label>Future pay raises</label><select id="pe-rwin" onchange="peChanged()"><option value="5"></option><option value="10"></option><option value="15"></option><option value="20"></option><option value="custom">Custom rate</option></select></div><div class="field"><label>&nbsp;</label><input type="number" id="pe-rcustom" step="0.1" min="0" max="10" placeholder="% per year" oninput="peChanged()" style="display:none"></div></div>
       <div id="pe-out"></div>
     </div></div>
     <div class="panel"><div class="panel-body">
-      <div class="grid-2">
-        <div class="field"><label>Active-Duty Service Date</label><input type="date" id="rc-svc" value="2012-06-01" oninput="Dq('calcRetireCompare')"></div>
-        <div class="field"><label>Retirement System</label><select id="rc-system" onchange="updateBrsDisplay();calcRetireCompare();if(window.renderMission)window.renderMission()"><option value="high3">High-3 — 2.5%/yr (50% at 20 yrs)</option><option value="brs">Blended (BRS) — 2.0%/yr (40% at 20 yrs)</option></select></div>
-      </div>
       <!-- BRS-specific fields (hidden when High-3 selected) -->
       <div id="brs-fields" style="display:none;margin:.5rem 0 0">
         <div style="font-size:.52rem;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.35rem">BRS — TSP Matching &amp; Continuation Pay</div>
