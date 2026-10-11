@@ -11307,21 +11307,11 @@ function _cdDrawChart(){
   var nLab=Math.min(5,n),xl='',k,idx,dd,lab,span=(pts[n-1].d-pts[0].d)/86400000;
   for(k=0;k<nLab;k++){idx=Math.round(k/((nLab-1)||1)*(n-1));dd=pts[idx].d;lab=span>420?dd.toLocaleDateString('en-US',{month:'short',year:'2-digit'}):dd.toLocaleDateString('en-US',{month:'short',day:'numeric'});
     xl+='<text x="'+X(idx).toFixed(1)+'" y="'+(H-6)+'" text-anchor="middle" font-size="8" fill="var(--muted)" font-family="DM Mono,monospace">'+lab+'</text>';}
-  // Trend coloring on the IN-VIEW series: green = higher highs & higher lows,
-  // red = lower highs & lower lows, gold = unconfirmed transition. Re-judged per timeframe.
-  var _rmn=Math.min.apply(null,vals),_rmx=Math.max.apply(null,vals);
-  var _piv=_cdPivots(vals,Math.max(1,(_rmx-_rmn)*0.10)),_leg=_cdLegColors(_piv);
-  var _tr=_leg.length?_leg[_leg.length-1]:'neutral';color=_cdColOf(_tr);
-  var _body='',_lk,_a,_b,_lc,_seg,_lj;
-  for(_lk=1;_lk<_piv.length;_lk++){_a=_piv[_lk-1].i;_b=_piv[_lk].i;_lc=_cdColOf(_leg[_lk-1]);
-    _seg='M'+X(_a).toFixed(1)+','+(H-PB)+' L'+X(_a).toFixed(1)+','+Y(vals[_a]).toFixed(1);
-    for(_lj=_a+1;_lj<=_b;_lj++)_seg+=' L'+X(_lj).toFixed(1)+','+Y(vals[_lj]).toFixed(1);
-    _seg+=' L'+X(_b).toFixed(1)+','+(H-PB)+' Z';
-    _body+='<path d="'+_seg+'" fill="'+_lc+'" fill-opacity="0.11"/>';
-    _seg='M'+X(_a).toFixed(1)+','+Y(vals[_a]).toFixed(1);
-    for(_lj=_a+1;_lj<=_b;_lj++)_seg+=' L'+X(_lj).toFixed(1)+','+Y(vals[_lj]).toFixed(1);
-    _body+='<path d="'+_seg+'" fill="none" stroke="'+_lc+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
-  }
+  // One solid series in the metric's own color (trend coloring removed 2026-10-11)
+  var _line='M'+X(0).toFixed(1)+','+Y(vals[0]).toFixed(1),_lj;
+  for(_lj=1;_lj<n;_lj++)_line+=' L'+X(_lj).toFixed(1)+','+Y(vals[_lj]).toFixed(1);
+  var _body='<path d="'+_line+' L'+X(n-1).toFixed(1)+','+(H-PB)+' L'+X(0).toFixed(1)+','+(H-PB)+' Z" fill="'+color+'" fill-opacity="0.11"/>'
+    +'<path d="'+_line+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
   svg.innerHTML=grid+xl+_body+'<circle cx="'+X(n-1).toFixed(1)+'" cy="'+Y(vals[n-1]).toFixed(1)+'" r="3" fill="'+color+'"/><line id="cd-cross" x1="0" y1="'+PT+'" x2="0" y2="'+(H-PB)+'" stroke="var(--text)" stroke-width="1" opacity="0"/>';
   var _tvel=el('cd-trendv');if(_tvel)_tvel.style.color=color;
   var startV=vals[0],ch=liveNow-startV;
