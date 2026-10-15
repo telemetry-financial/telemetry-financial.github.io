@@ -8968,7 +8968,7 @@ function renderTspIftLog(){
     return t.past?f.map(function(k){return _tspName(k).replace(' Fund','');}).join(' + ')+' → '+b.map(function(k){return _tspName(k).replace(' Fund','');}).join(' + ')+' · '+f.map(function(k){return sh((parseFloat(t.before[k])||0)-(parseFloat((t.after||{})[k])||0))+' sh';}).join(' + '):mix(t.from)+' → '+mix(t.to);};
   const html=rows.slice(0,8).map(function(r){
     if(r.m){const m=r.m,ents=m.legs.map(function(l){return tspIftLog.find(function(t){return String(t.id)===String(l.id);});}).filter(Boolean),allPast=ents.every(function(t){return t.past;}),tag=m.grade==='good'?'Won':m.grade==='bad'?'Lost':'Even';
-      return '<div class="tr-log tr-trip"><span><b>'+_trLbl(m.startDate).replace(/, \d{4}$/,'')+' – '+_trLbl(m.endDate)+'</b> · <span class="ts-tag '+m.grade+'">'+tag+'</span> <span class="pv-num" style="color:'+_pvC(m.diff)+'">'+(m.dSh!=null?_tsSS(m.dSh)+' '+_tsShort(m.one)+' sh · ':'')+_pvS(m.diff,0)+'</span>'+
+      return '<div class="tr-log tr-trip"><span><b>'+_trLbl(m.startDate).replace(/, \d{4}$/,'')+' – '+_trLbl(m.endDate)+'</b> · <span class="ts-tag '+m.grade+'">'+tag+'</span> <span class="pv-num" style="color:'+_pvC(m.diff)+'">'+(_tsShareTxt(_tsShareGain(m))?_tsShareTxt(_tsShareGain(m)).replace(/<\/span>/g,' sh</span>')+' · ':'')+_pvS(m.diff,0)+'</span>'+
         '<em>Round trip · '+_esc(m.chain.map(function(s){return s.replace(' Fund','');}).join(' → '))+'</em>'+
         '<em class="tr-legs">'+ents.map(function(t){return _trLbl(t.date).replace(/, \d{4}$/,'')+': '+legRow(t);}).join('<br>')+'</em></span>'+
         '<span class="tr-acts"><button type="button" class="btn sm" onclick="tsOpen(\'trip\',\''+m.id+'\')">Scorecard</button>'+
@@ -9257,6 +9257,26 @@ function _tsMoves(){
   open.sort(function(a,b){return a.startDate<b.startDate?1:-1;});
   return {open:open,done:done};
 }
+// ── shares gained vs. staying, per fund, for any move ──
+// One fund left: that fund's shares (exact on a straight round trip, equivalent otherwise).
+// Several funds left: when the money came back into those same funds, the actual per-fund share
+// difference; otherwise today's value split like what you sold, in shares of each of those funds.
+function _tsShareGain(m){
+  const o={};if(!m||!m.stay)return o;
+  if(m.one&&m.dSh!=null){o[m.one]=m.dSh;return o;}
+  const pn=m.pn,sk=Object.keys(m.stay).filter(function(k){return m.stay[k]>1e-9;}),bk=Object.keys(m.basket).filter(function(k){return m.basket[k]>1e-9;});
+  if(m.one){const p=pn(m.one);if(p>0)o[m.one]=m.haveNow/p-m.stay[m.one];return o;}
+  if(m.back&&bk.every(function(k){return sk.indexOf(k)>=0;})){sk.forEach(function(k){o[k]=(m.basket[k]||0)-m.stay[k];});return o;}
+  let sv=0;sk.forEach(function(k){sv+=m.stay[k]*pn(k);});
+  sk.forEach(function(k){const p=pn(k);if(p>0&&sv>0)o[k]=m.haveNow*(m.stay[k]*p/sv)/p-m.stay[k];});
+  return o;
+}
+function _tsShareSum(L){const o={};L.forEach(function(m){const g=_tsShareGain(m);Object.keys(g).forEach(function(k){o[k]=(o[k]||0)+g[k];});});return o;}
+function _tsShareTxt(o,sep){const ks=Object.keys(o).sort(function(a,b){return Math.abs(o[b])-Math.abs(o[a]);});
+  return ks.length?ks.map(function(k){return '<span style="color:'+_pvC(o[k])+';white-space:nowrap">'+_tsSS(o[k])+' '+_esc(_tsShort(k))+'</span>';}).join(sep||' · '):'';}
+function _tsShareBig(o){const ks=Object.keys(o).filter(function(k){return Math.abs(o[k])>=0.005;}).sort(function(a,b){return Math.abs(o[b])-Math.abs(o[a]);});
+  if(!ks.length)return '+0.00 <small>sh</small>';
+  return ks.map(function(k,i){return '<span style="display:block;color:'+_pvC(o[k])+(i?';font-size:.62em;line-height:1.35':'')+'">'+_tsSS(o[k])+' <small>'+_esc(_tsShort(k))+' sh</small></span>';}).join('');}
 // forward value of a dollar difference, on the same assumptions as the FIRE plan
 function _tsFwd(d){
   const r=(val('f-ret')||7)/100,i=typeof inflRate==='function'?inflRate():0.025,tx=typeof taxRate==='function'?taxRate():0.12,swr=(val('f-swr')||4)/100;
@@ -9323,7 +9343,7 @@ function _tsTripHtml(m,M){
   // tiles
   h+='<div class="ts-tiles">';
   if(m.dSh!=null)h+=_tsTile(m.mixBack?'Shares (equivalent)':'Shares',_tsSS(m.dSh),(m.mixBack?'Your '+_esc(m.chain[m.chain.length-1])+' mix, counted in '+_tsShort(x)+' shares, vs. staying':_tsShort(x)+' shares '+(m.dSh>=0?'more':'fewer')+' than if you’d stayed')+' · <span class="pv-num">'+_pvP(m.dSh/m.stay[x]*100,1)+'</span>',col);
-  else h+=_tsTile('Moved money now',_pvM(m.haveNow,0),'vs. <span class="pv-num">'+_pvM(m.stayNow,0)+'</span> if you’d stayed',col);
+  else h+=_tsTile('Shares gained',_tsShareBig(_tsShareGain(m)),(m.back?'Per fund, vs. keeping the shares you sold':'Today’s value split like what you sold, in shares')+' · <span class="pv-num">'+_pvM(m.haveNow,0)+'</span> vs. <span class="pv-num">'+_pvM(m.stayNow,0)+'</span>','');
   h+=_tsTile('Value today',_pvS(m.diff,0),x?_tsShort(x)+'’s latest close: <span class="pv-num">'+_pvM(m.pn(x),2)+'</span> ('+_tsMD(_tsNowDate())+')':'At the latest closing prices ('+_tsMD(_tsNowDate())+')',col);
   h+=_tsTile((F.fi?'At your FI date · ':'In 20 years · ')+F.yr,_pvS(F.real,0),'Today’s dollars, before tax · <span class="pv-num">'+_pvS(F.nom,0)+'</span> nominal',col);
   h+=_tsTile('Retirement income',_pvS(F.inc,0)+'<small>/yr</small>','After tax, at your '+(F.swr*100).toFixed(1).replace(/\.0$/,'')+'% withdrawal rate',col);
@@ -9416,16 +9436,16 @@ function _tsMovesHtml(M){
   M.open.forEach(function(o){h+=_tsOpenHtml(o);});
   if(!M.open.length)h+='<div class="pv-card"><span class="pv-mut">No open moves — all of your moved money is back where it started or kept as a permanent change.</span></div>';
   const cl=M.done,won=cl.filter(function(m){return m.grade==='good';}).length,sum=cl.reduce(function(s,m){return s+m.diff;},0),all=sum+M.open.reduce(function(s,m){return s+m.diff;},0);
-  const sx=cl.length&&cl.every(function(m){return m.dSh!=null&&m.one===cl[0].one;})?cl.reduce(function(s,m){return s+m.dSh;},0):null;
+  const shF=_tsShareSum(cl),shA=_tsShareSum(cl.concat(M.open));
   h+='<div class="ts-tiles">'+
-    _tsTile('Finished moves vs. never moving',sx!=null?_tsSS(sx)+' <small>'+_tsShort(cl[0].one)+' sh</small>':_pvS(sum,0),(sx!=null?'<span class="pv-num">'+_pvS(sum,0)+'</span> today · ':'')+cl.length+' finished move'+(cl.length===1?'':'s'),cl.length?_pvC(sum):'')+
+    _tsTile('Shares gained · finished moves',cl.length?_tsShareBig(shF):'—',(cl.length?'<span class="pv-num" style="color:'+_pvC(sum)+'">'+_pvS(sum,0)+'</span> today · ':'')+cl.length+' finished move'+(cl.length===1?'':'s')+' vs. never moving','')+
     _tsTile('Beat staying put',cl.length?won+' of '+cl.length:'—','Finished moves that came out ahead','')+
-    _tsTile('Including open moves',_pvS(all,0),'At the latest closing prices ('+_tsMD(_tsNowDate())+')',_pvC(all))+'</div>';
+    _tsTile('Shares gained · including open',(cl.length||M.open.length)?_tsShareBig(shA):'—','<span class="pv-num" style="color:'+_pvC(all)+'">'+_pvS(all,0)+'</span> at the latest closes ('+_tsMD(_tsNowDate())+')','')+'</div>';
   const rows=M.open.concat(cl).sort(function(a,b){return a.startDate<b.startDate?1:a.startDate>b.startDate?-1:b.id-a.id;});
   h+='<div class="pv-card"><b class="pv-h">Every move</b><div class="ts-tbl" style="margin-top:8px"><div class="ts-row hd"><span>Dates</span><span>Move</span><span class="r">Days out</span><span class="r">Shares</span><span class="r">Value today</span><span class="r">Result</span></div>'+
     rows.map(function(m){const end=m.status==='closed'?m.endDate:_tsNowDate(),d=_tsDays(m.startDate,end),tag=m.status==='open'?'<span class="ts-tag open">Open</span>':m.kept?'<span class="ts-tag kept">Kept</span>':'<span class="ts-tag '+m.grade+'">'+(m.grade==='good'?'Won':m.grade==='bad'?'Lost':'Even')+'</span>';
       const cells='<span>'+_tsMD(m.startDate)+' – '+(m.status==='closed'?_tsMD(m.endDate):'<i>'+(m.kept?'kept':'open')+'</i>')+'</span><span>'+_esc(m.chain.map(function(s){return s.replace(' Fund','');}).join(' → '))+'</span><span class="r pv-num">'+d+'</span>'+
-        '<span class="r pv-num" style="color:'+(m.dSh!=null?_pvC(m.dSh):'var(--muted)')+'">'+(m.dSh!=null?_tsSS(m.dSh)+' '+_tsShort(m.one):'—')+'</span><span class="r pv-num" style="color:'+_pvC(m.diff)+'">'+_pvS(m.diff,0)+'</span><span class="r">'+tag+'</span>';
+        '<span class="r pv-num">'+(_tsShareTxt(_tsShareGain(m),'<br>')||'—')+'</span><span class="r pv-num" style="color:'+_pvC(m.diff)+'">'+_pvS(m.diff,0)+'</span><span class="r">'+tag+'</span>';
       return m.status==='open'?'<div class="ts-row">'+cells+'</div>':'<button type="button" class="ts-row" onclick="tsOpen(\'trip\',\''+m.id+'\')" aria-label="Open the scorecard for '+_esc(m.chain.join(' to '))+'">'+cells+'</button>';}).join('')+'</div></div>';
   h+='<div class="ts-foot"><span>'+_tsAssume(_tsFwd(0))+'</span></div></div>';
   return h;
