@@ -1063,7 +1063,7 @@ input[type="range"]{background:rgba(31,35,48,.10)!important;}
 .pb2-creates div{font-size:.6rem;line-height:1.45;padding:.45rem .55rem;border:1px solid var(--border);border-radius:10px;background:var(--surface2);color:var(--text)}
 .pb2-creates small{display:block;font-size:.48rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:.1rem}
 @media (max-width:640px){.pb2-own{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 40px}.pb2-own .pb2-f:first-child{grid-column:1 / -1}}
-.pf-sellbtn{min-height:28px;padding:0 .6rem;border-radius:6px;border:1px solid var(--green);background:transparent;color:var(--green);font:600 .6rem Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;vertical-align:middle}.pf-sellbtn:hover{background:var(--green);color:var(--bg,#0e1117)}.pf-sellbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pf-sellbtn{min-height:28px;padding:0 .6rem;border-radius:6px;border:1px solid var(--green);background:transparent;color:var(--green);font:600 .6rem Inter,system-ui,sans-serif;letter-spacing:.04em;cursor:pointer;vertical-align:middle}.pf-sellbtn:hover{background:var(--green);color:var(--bg,#0e1117)}.pf-sellbtn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.pf-depbtn{border-color:var(--blue);color:var(--blue);white-space:nowrap}.pf-depbtn:hover{background:var(--blue);color:var(--bg,#0e1117)}
 </style>
 <style id="dtx-css">
 .dtx-paybar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:.55rem .8rem;margin:.55rem 0}
@@ -2268,6 +2268,98 @@ html.he-lock,html.he-lock body{overflow:hidden}
 #tr-overlay .tr-go:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:560px){#tsp-fund-rows .tr-rowh,#tsp-fund-rows .tr-row{grid-template-columns:1fr 1.3fr 48px}#tsp-fund-rows .tr-px,#tsp-fund-rows .tr-rowh span:last-child{grid-column:1/-1;justify-self:end}}
 </style>
+<style id="ts-css">
+/* TSP trade scorecard — summary line in the TSP card + the scorecard dialog */
+#tsp-score:empty{display:none}
+#tsp-score .ts-sum{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:.1rem .65rem .6rem;padding:10px 0 2px;border-top:1px solid var(--border);font:13px Inter,sans-serif;color:var(--text)}
+#tsp-score .ts-sum em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:3px;font-family:'DM Mono',monospace;overflow-wrap:anywhere}
+#tsp-score .ts-sum .btn.sm{min-height:36px;padding:0 12px;font-size:13px;white-space:nowrap;flex-shrink:0}
+#tsp-score .ts-tag,#ts-overlay .ts-tag{display:inline-block;padding:1px 8px;margin-right:6px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;vertical-align:1px}
+.ts-tag.open,#ts-overlay .ts-tag.open{background:color-mix(in srgb,var(--blue) 16%,transparent);color:var(--blue)}
+.ts-tag.good,#ts-overlay .ts-tag.good{background:color-mix(in srgb,var(--green) 14%,transparent);color:var(--green)}
+.ts-tag.bad,#ts-overlay .ts-tag.bad{background:color-mix(in srgb,var(--red) 14%,transparent);color:var(--red)}
+.ts-tag.even,#ts-overlay .ts-tag.even,.ts-tag.kept,#ts-overlay .ts-tag.kept{background:var(--surface2);color:var(--muted)}
+#ts-overlay .ts-modal{max-width:1100px;width:calc(100vw - 32px);font-family:Inter,sans-serif;color:var(--text)}
+#ts-overlay .ts-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:14px}
+#ts-overlay .ts-eye{font-size:12px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;color:var(--accent-dim);margin-bottom:6px}
+:root[data-theme="dark"] #ts-overlay .ts-eye{color:var(--accent)}
+#ts-overlay h2{margin:0;font:400 clamp(22px,3vw,30px)/1.15 'DM Serif Display',serif;overflow-wrap:anywhere}
+#ts-overlay .ts-sub{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.5}
+#ts-overlay .ts-body{gap:18px}
+#ts-overlay .ts-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px}
+#ts-overlay .ts-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-weight:600;font-size:13.5px}
+#ts-overlay .ts-pill.good{background:color-mix(in srgb,var(--green) 13%,transparent);color:var(--green)}
+#ts-overlay .ts-pill.bad{background:color-mix(in srgb,var(--red) 13%,transparent);color:var(--red)}
+#ts-overlay .ts-pill.even{background:var(--surface2);color:var(--muted)}
+#ts-overlay .ts-chip{display:inline-flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--border);font-size:13.5px;line-height:1.4}
+#ts-overlay .ts-chip i{display:inline-block;width:11px;height:11px;border-radius:50%;border:2px solid var(--accent);box-sizing:border-box}
+#ts-overlay .ts-chip i.on{background:var(--accent)}
+#ts-overlay .ts-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+#ts-overlay .ts-tile{display:flex;flex-direction:column;gap:6px;padding:18px 20px}
+#ts-overlay .ts-k{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;color:var(--muted)}
+#ts-overlay .ts-v{font:400 clamp(26px,3.2vw,36px)/1.05 'DM Serif Display',serif;overflow-wrap:anywhere}
+#ts-overlay .ts-v small{font-size:.55em}
+#ts-overlay .ts-s{font-size:13px;color:var(--muted);line-height:1.45}
+#ts-overlay .ts-cols{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:18px;align-items:start}
+#ts-overlay .ts-plot{height:230px}
+#ts-overlay .ts-shade{position:absolute;top:0;bottom:0;background:color-mix(in srgb,var(--blue) 11%,transparent);pointer-events:none}
+#ts-overlay .ts-dot{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;box-shadow:0 0 0 3px var(--surface);pointer-events:none}
+#ts-overlay .ts-flag{position:absolute;transform:translate(-50%,0);background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px 8px;font-size:12px;white-space:nowrap;pointer-events:none}
+#ts-overlay .ts-leg{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted)}
+#ts-overlay .ts-leg span{display:inline-flex;align-items:center;gap:6px}
+#ts-overlay .ts-leg i{display:inline-block;width:16px;height:0;border-top:2.5px solid var(--accent)}
+#ts-overlay .ts-leg i.dash{border-top:2px dashed var(--muted)}
+#ts-overlay .ts-leg i.box{width:14px;height:10px;border:none;background:color-mix(in srgb,var(--blue) 18%,transparent)}
+#ts-overlay .ts-cmp{display:flex;flex-direction:column;gap:14px}
+#ts-overlay .ts-bar{display:flex;flex-direction:column;gap:6px}
+#ts-overlay .ts-bar>div{display:flex;justify-content:space-between;gap:10px}
+#ts-overlay .ts-bar i{display:block;height:14px;border-radius:7px}
+#ts-overlay .ts-bar em{font-style:normal;font-size:12.5px;color:var(--muted);font-family:'DM Mono',monospace}
+#ts-overlay .ts-grid4{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;border-top:1px solid var(--border);padding-top:12px}
+#ts-overlay .ts-grid4 span,#ts-overlay .ts-stats span{display:block;font-size:12.5px;color:var(--muted)}
+#ts-overlay .ts-grid4 b,#ts-overlay .ts-stats b{font:400 14px 'DM Mono',monospace}
+#ts-overlay .ts-legs{display:grid;grid-template-columns:110px minmax(0,1fr) 24px minmax(0,1fr);gap:10px 16px;align-items:center;margin-top:10px}
+#ts-overlay .ts-legs .h{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+#ts-overlay .ts-legs .pv-num{font-size:13.5px;line-height:1.55;overflow-wrap:anywhere}
+#ts-overlay .ts-open{display:flex;flex-direction:column;gap:18px}
+#ts-overlay .ts-oh{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:14px}
+#ts-overlay .ts-oh>div:last-child{text-align:right}
+#ts-overlay .ts-ot{font-size:17px;font-weight:600;margin-left:4px}
+#ts-overlay .ts-ob{font:400 clamp(24px,3vw,32px)/1.1 'DM Serif Display',serif}
+#ts-overlay .ts-be{position:relative;height:58px;margin-top:4px}
+#ts-overlay .ts-be .trk{position:absolute;left:0;right:0;top:20px;height:14px;border-radius:7px;overflow:hidden;display:flex}
+#ts-overlay .ts-be .trk i{display:block;height:100%}
+#ts-overlay .ts-be .mk{position:absolute;top:12px;width:2px;height:30px;margin-left:-1px;background:var(--text)}
+#ts-overlay .ts-be .now{position:absolute;top:14px;width:26px;height:26px;margin-left:-13px;border-radius:50%;background:var(--accent);border:3px solid var(--surface);box-sizing:border-box;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+#ts-overlay .ts-be .lb{position:absolute;top:42px;transform:translateX(-50%);font:12px 'DM Mono',monospace;white-space:nowrap}
+#ts-overlay .ts-be .side{position:absolute;top:0;font-size:12px;font-weight:600}
+#ts-overlay .ts-be .wi{position:absolute;top:17px;width:20px;height:20px;margin-left:-10px;border-radius:50%;border:3px solid var(--surface);box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+#ts-overlay .ts-wi{border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--surface2)}
+#ts-overlay .ts-wih{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 14px;font-size:13.5px}
+#ts-overlay .ts-wif{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 12px}
+#ts-overlay .ts-wif label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted);min-width:0}
+#ts-overlay .ts-wif input{width:130px;max-width:100%;box-sizing:border-box;font:14px 'DM Mono',monospace;text-align:right}
+#ts-overlay .ts-wif .ts-wig{margin-left:auto}
+#ts-overlay .ts-wior{font-size:12px;color:var(--muted);padding-bottom:8px}
+#ts-overlay .ts-wio{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
+#ts-overlay .ts-wio:empty{display:none}
+#ts-overlay .ts-wio span{display:block;font-size:12px;color:var(--muted)}
+#ts-overlay .ts-wio b{display:block;font:500 15px 'DM Mono',monospace;overflow-wrap:anywhere}
+#ts-overlay .ts-wio em{display:block;font:normal 11.5px 'DM Mono',monospace;color:var(--muted)}
+@media (max-width:640px){#ts-overlay .ts-wio{grid-template-columns:repeat(2,minmax(0,1fr))}#ts-overlay .ts-wif .ts-wig{margin-left:0}}
+#ts-overlay .ts-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;border-top:1px solid var(--border);padding-top:14px}
+#ts-overlay .ts-tbl{overflow-x:auto}
+#ts-overlay .ts-row{display:grid;grid-template-columns:minmax(150px,1.2fr) minmax(170px,1.6fr) 80px 120px 120px 76px;gap:12px;align-items:center;min-width:760px;padding:11px 6px;border-top:1px solid var(--border);font-size:14px;text-align:left;width:100%;background:none;border-left:none;border-right:none;border-bottom:none;color:var(--text);font-family:Inter,sans-serif}
+#ts-overlay .ts-row.hd{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);border-top:none;padding-top:4px}
+#ts-overlay button.ts-row{cursor:pointer;border-radius:8px}
+#ts-overlay button.ts-row:hover{background:var(--surface2)}
+#ts-overlay button.ts-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+#ts-overlay .ts-row .r{text-align:right}
+#ts-overlay .ts-foot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 16px;font-size:13px;color:var(--muted);line-height:1.5}
+#ts-overlay .ts-act{display:flex;flex-wrap:wrap;gap:4px 18px}
+#ts-overlay .btn{min-height:40px;padding:0 14px;border-radius:10px;font-size:13.5px}
+@media(max-width:820px){#ts-overlay .ts-cols{grid-template-columns:1fr}#ts-overlay .ts-stats{grid-template-columns:repeat(2,minmax(0,1fr))}#ts-overlay .ts-legs{grid-template-columns:1fr}#ts-overlay .ts-legs .h,#ts-overlay .ts-legs .ar{display:none}#ts-overlay .ts-oh>div:last-child{text-align:left}}
+</style>
 <style id="dv-add-css">
 #dt-v2 #dv-addform{margin-top:0}
 #dt-v2 #dv-addform .dv-fsec{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px;padding-top:12px;border-top:1px solid var(--border)}
@@ -2858,11 +2950,12 @@ html.ob-lock,html.ob-lock body{overflow:hidden!important}
             <input type="hidden" id="f-tsp" value="0" readonly="">
           </div>
           <div class="mil-only tspf" id="tspfunds-wrap">
-            <div class="tspf-hd"><span>TSP funds — balance by fund</span><span id="tsp-price-asof" title="Date of the share prices currently loaded. Re-sync if this is stale." style="font-size:.5rem;align-self:center;color:var(--muted);white-space:nowrap"></span><span style="display:flex;gap:.35rem;flex-wrap:wrap"><span class="tspf-tab tr-btn" role="button" tabindex="0" onclick="tspRebalance()" onkeydown="if(event.key==='Enter')tspRebalance()">⇄ Rebalance / transfer</span><span class="tspf-tab" role="button" tabindex="0" onclick="tspHistOpen()" onkeydown="if(event.key==='Enter')tspHistOpen()">📈 Balance history</span><span class="tspf-tab" onclick="syncTspPrices()">🔄 Sync Share Prices</span><span class="tspf-tab" onclick="toggleTspPicker()">☰ Select Funds</span></span></div>
+            <div class="tspf-hd"><span>TSP funds — balance by fund</span><span id="tsp-price-asof" title="Date of the share prices currently loaded. Re-sync if this is stale." style="font-size:.5rem;align-self:center;color:var(--muted);white-space:nowrap"></span><span style="display:flex;gap:.35rem;flex-wrap:wrap"><span class="tspf-tab tr-btn" role="button" tabindex="0" onclick="tspRebalance()" onkeydown="if(event.key==='Enter')tspRebalance()">⇄ Rebalance / transfer</span><span class="tspf-tab" role="button" tabindex="0" onclick="tsOpen()" onkeydown="if(event.key==='Enter')tsOpen()">📊 Trade scorecard</span><span class="tspf-tab" role="button" tabindex="0" onclick="tspHistOpen()" onkeydown="if(event.key==='Enter')tspHistOpen()">📈 Balance history</span><span class="tspf-tab" onclick="syncTspPrices()">🔄 Sync Share Prices</span><span class="tspf-tab" onclick="toggleTspPicker()">☰ Select Funds</span></span></div>
             <div class="tspf-picker" id="tsp-picker"></div>
             <div class="tspf-rows" id="tsp-fund-rows"></div>
             <div class="tspf-tot"><span>TSP Funds Total</span><span class="v" id="tspf-total-val"></span></div>
             <div id="tsp-ift-log"></div>
+            <div id="tsp-score"></div>
           </div>
           <div class="mil-only" style="margin-top:.5rem;padding:.55rem .65rem;background:var(--surface2);border:1px solid var(--border);border-radius:10px;">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.4rem;gap:.5rem;flex-wrap:wrap"><span style="font-size:.6rem;font-weight:600;color:var(--text)">🧾 Roth vs Traditional TSP</span><span id="tsp-split-rec" style="font-size:.48rem;color:var(--muted)"></span></div>
@@ -5175,7 +5268,7 @@ function gatherState(){
     // Investment Portfolio
     portfolio: portfolio,
     // TSP funds (shares/price per fund) + which are hidden from view
-    tspFunds: tspFunds, tspHidden: tspHidden, tspPxHist: tspPxHist, tspIftLog: tspIftLog, tspBalHist: tspBalHist,
+    tspFunds: tspFunds, tspHidden: tspHidden, tspPxHist: tspPxHist, tspIftLog: tspIftLog, tspMoveFlags: tspMoveFlags, tspWhatIf: tspWhatIf, tspBalHist: tspBalHist,
     budgetItems: budgetItems, deletedBudget: deletedFixed, deletedCards: deletedCards, collapsedCards: collapsedCards, bcShown: bcShown, bsView: bsView, bsUnit: bsUnit, budgetLabels: budgetLabels, expClass: expClass, budgetColors: budgetColors, customCats: customCats, layout: layoutOrder, tabUI: tabUI, payFreqs:{pay:sval('b-pay-freq'),pay2:sval('b-pay2-freq'),side:sval('b-side-freq'),other:sval('b-other-inc-freq')}, payForecast: payForecast, budgetAsOf:(el('pf-asof')&&el('pf-asof')?.value)||'', paycheckAssign: paycheckAssign, ppSchedule: ppSchedule,
     rc_svc:sval('rc-svc'),rc_bp1:val('rc-bp1'),rc_bp2:val('rc-bp2'),rc_bp3:val('rc-bp3'),rc_cpay:val('rc-cpay'),rc_cage:ival('rc-cage'),rc_cmode:sval('rc-cmode'),rc_cuse1:el('rc-cuse1')?el('rc-cuse1')?.checked:true,rc_cuse2:el('rc-cuse2')?el('rc-cuse2')?.checked:true,rc_cuse3:el('rc-cuse3')?el('rc-cuse3')?.checked:true,rc_system:sval('rc-system'),rc_y1:sval('rc-y1'),rc_y2:sval('rc-y2'),rc_y3:sval('rc-y3'),rc_age:ival('rc-age'),rc_le:ival('rc-le'),
     rf_cur_bal:val('rf-cur-bal'),rf_cur_rate:val('rf-cur-rate'),rf_cur_term:val('rf-cur-term'),rf_cur_paid:val('rf-cur-paid'),rf_new_rate:val('rf-new-rate'),rf_new_term:val('rf-new-term'),rf_new_cost:val('rf-new-cost'),rf_new_cashout:val('rf-new-cashout'),rf_new_roll:el('rf-new-roll')?el('rf-new-roll')?.checked:false,
@@ -5263,6 +5356,7 @@ function applyState(s){
   heCfg={app:(s.heCfg&&s.heCfg.app!=null&&isFinite(+s.heCfg.app))?+s.heCfg.app:3,price:(s.heCfg&&+s.heCfg.price>0)?+s.heCfg.price:0};
   acctShown=Array.isArray(s.acctShown)?s.acctShown.filter(function(k){return typeof k==='string';}):[];
   portfolio=Array.isArray(s.portfolio)?s.portfolio:[];
+  if(typeof pfPostDueDeposits==='function')pfPostDueDeposits();
   if(typeof renderPortfolio==='function')renderPortfolio();
   dtId=debts.length?Math.max(...debts.map(d=>d.id))+1:0;
   debtTypes=Array.isArray(s.debtTypes)&&s.debtTypes.length?s.debtTypes:DEFAULT_DEBT_TYPES.map(t=>({...t}));
@@ -5308,7 +5402,7 @@ function applyState(s){
   if(typeof applyDeletedCards==='function')applyDeletedCards();
   if(typeof applyCollapsedCards==='function')applyCollapsedCards();
   tspFunds=(s.tspFunds&&typeof s.tspFunds==='object'&&!Array.isArray(s.tspFunds))?s.tspFunds:{};
-  tspPxHist=(s.tspPxHist&&typeof s.tspPxHist==='object'&&!Array.isArray(s.tspPxHist))?s.tspPxHist:{};tspIftLog=Array.isArray(s.tspIftLog)?s.tspIftLog:[];tspBalHist=Array.isArray(s.tspBalHist)?s.tspBalHist.filter(function(p){return p&&/^\d{4}-\d{2}-\d{2}$/.test(p.d)&&p.v>0;}):[];
+  tspPxHist=(s.tspPxHist&&typeof s.tspPxHist==='object'&&!Array.isArray(s.tspPxHist))?s.tspPxHist:{};tspIftLog=Array.isArray(s.tspIftLog)?s.tspIftLog:[];tspMoveFlags=(s.tspMoveFlags&&typeof s.tspMoveFlags==='object'&&!Array.isArray(s.tspMoveFlags))?s.tspMoveFlags:{};tspWhatIf=(s.tspWhatIf&&typeof s.tspWhatIf==='object'&&!Array.isArray(s.tspWhatIf))?s.tspWhatIf:{};tspBalHist=Array.isArray(s.tspBalHist)?s.tspBalHist.filter(function(p){return p&&/^\d{4}-\d{2}-\d{2}$/.test(p.d)&&p.v>0;}):[];
   tspHidden=Array.isArray(s.tspHidden)?s.tspHidden:TSP_FUNDS.filter(([k])=>!TSP_DEFAULT_VISIBLE.includes(k)).map(([k])=>k);
   if(s.budget){
     const b=s.budget;
@@ -5783,6 +5877,192 @@ function pfUndoSale(accId){
   },'Undo last sale?','Yes, undo');
 }
 function pfRealized(yr){let g=0;portfolio.forEach(function(a){(a.sales||[]).forEach(function(s){if(!yr||String(s.date||'').slice(0,4)===String(yr))g+=parseFloat(s.gain)||0;});});return g;}
+// ===== Deposit funds → cash =====
+// Adds money to an account's cash position (*CASH, SPAXX…), creating a *CASH position if the
+// account has none (same rule as sale proceeds). One-time deposits dated today or earlier post
+// immediately. Recurring deposits (and future-dated one-time deposits) are stored as plans on
+// the account (a.depositPlans) and post automatically on each due date — checked when a plan
+// loads and every time the Investments tab renders. Every posted deposit is logged on the
+// account (a.deposits) and can be removed, which takes the money back out of cash.
+let _pfDep=null,_pfDepSeq=0;
+const PF_DEP_FREQ={once:'One time',weekly:'Every week',biweekly:'Every 2 weeks',twicemonthly:'1st & 15th of the month',monthly:'Every month'};
+function _pfIso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function _pfDateLbl(iso){const d=new Date(iso+'T00:00:00');return isNaN(d)?(iso||''):d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function _pfOrd(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);}
+// Occurrence dates of plan p that fall in (fromIso, toIso], never before p.start or after p.end.
+function _pfDepDates(p,fromIso,toIso){
+  const out=[];if(!p||!p.start)return out;const st=new Date(p.start+'T00:00:00');if(isNaN(st))return out;
+  const lim=(p.end&&p.end<toIso)?p.end:toIso;fromIso=fromIso||'';let g=0;
+  const push=function(d){const s=_pfIso(d);if(s>=p.start&&s>fromIso&&s<=lim)out.push(s);};
+  if(p.freq==='once'){push(st);}
+  else if(p.freq==='weekly'||p.freq==='biweekly'){const step=p.freq==='weekly'?7:14,d=new Date(st);while(_pfIso(d)<=lim&&g++<6000){push(d);d.setDate(d.getDate()+step);}}
+  else if(p.freq==='monthly'){const dom=st.getDate();let y=st.getFullYear(),m=st.getMonth();while(g++<2400){const d=new Date(y,m,Math.min(dom,new Date(y,m+1,0).getDate()));if(_pfIso(d)>lim)break;push(d);if(++m>11){m=0;y++;}}}
+  else if(p.freq==='twicemonthly'){let y=st.getFullYear(),m=st.getMonth();while(g++<2400){const d1=new Date(y,m,1);if(_pfIso(d1)>lim)break;push(d1);push(new Date(y,m,15));if(++m>11){m=0;y++;}}}
+  return out;
+}
+function _pfDepNext(p){if(!p||p.paused)return '';const t=_pfToday(),far=new Date();far.setFullYear(far.getFullYear()+2);return _pfDepDates(p,t>(p.last||'')?t:p.last,_pfIso(far))[0]||'';}
+function _pfDepDesc(p){
+  const st=new Date(p.start+'T00:00:00');
+  if(p.freq==='once')return 'one time on '+_pfDateLbl(p.start);
+  if(p.freq==='monthly')return 'every month on the '+_pfOrd(st.getDate());
+  if(p.freq==='twicemonthly')return 'on the 1st & 15th';
+  const wd=isNaN(st)?'':st.toLocaleDateString('en-US',{weekday:'long'});
+  return (p.freq==='weekly'?'every ':'every other ')+wd;
+}
+// Credit `amt` dollars to account a's cash position and log it.
+function _pfDepositApply(a,amt,date,note,planId){
+  if(!a.holdings)a.holdings=[];
+  let cash=_pfCashOf(a),created=false;
+  if(!cash){cash={id:pfHldId++,ticker:'*CASH',name:'Cash',shares:0,cost:1,price:1,prevClose:0,asset:'Cash',date:date,notes:'Created by a deposit'};a.holdings.push(cash);created=true;}
+  const cpx=parseFloat(cash.price)||1,sh=_r2x(amt/cpx);
+  cash.shares=_r2x((parseFloat(cash.shares)||0)+sh);
+  if(!a.deposits)a.deposits=[];
+  const rec={id:Date.now()*100+(_pfDepSeq++%100),date:date,amount:_r2(amt),note:note||'',cashId:cash.id,cashShares:sh,newCash:created,planId:planId||null};
+  a.deposits.push(rec);a.deposits.sort(function(x,y){return x.date<y.date?1:x.date>y.date?-1:y.id-x.id;});
+  return rec;
+}
+// Post every recurring/scheduled deposit that has come due (idempotent: p.last marks progress).
+function pfPostDueDeposits(quiet){
+  if(typeof portfolio==='undefined'||!portfolio.length)return 0;
+  if(typeof _pfSyncIds==='function')_pfSyncIds();
+  const t=_pfToday();let n=0,amt=0;
+  portfolio.forEach(function(a){(a.depositPlans||[]).forEach(function(p){
+    if(p.paused||!(parseFloat(p.amt)>0))return;
+    const ds=_pfDepDates(p,p.last||'',t);
+    ds.forEach(function(d){_pfDepositApply(a,parseFloat(p.amt),d,p.note||'',p.id);n++;amt+=parseFloat(p.amt);});
+    if(ds.length)p.last=ds[ds.length-1];
+  });});
+  if(n){if(typeof scheduleAutoSave==='function')scheduleAutoSave();if(!quiet&&typeof toast==='function')toast('Posted '+n+' scheduled deposit'+(n===1?'':'s')+' · '+fmtF(_r2(amt))+' to cash');}
+  return n;
+}
+function pfDeposit(accId){
+  if(!portfolio.length){toast('Add an account first','var(--red)');return;}
+  const def=portfolio.find(function(x){return x.id===accId;})||portfolio.find(function(x){return x.tax==='Taxable';})||portfolio[0];
+  _pfDep={accId:def.id};
+  let ov=el('pf-dep-overlay');
+  if(!ov){
+    ov=document.createElement('div');ov.id='pf-dep-overlay';ov.className='modal-overlay';
+    ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','pf-dp-title');
+    document.body.appendChild(ov);
+    ov.addEventListener('click',function(e){if(e.target===ov)pfDepositClose();});
+    document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open'))pfDepositClose();});
+  }
+  const L=function(f,t){return '<label class="pf-lbl" style="display:block" for="'+f+'">'+t+'</label>';};
+  ov.innerHTML='<div class="modal" style="max-width:460px">'+
+    '<div class="modal-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.9rem">'+
+      '<div><h2 id="pf-dp-title" style="font-size:1.1rem;margin:0">Deposit funds</h2>'+
+      '<div style="font-size:.6rem;color:var(--muted);margin-top:.25rem">Money goes to the account’s cash position, ready to buy with.</div></div>'+
+      '<button class="modal-close" type="button" onclick="pfDepositClose()" aria-label="Close">&times;</button></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem .7rem">'+
+      '<div style="grid-column:1/-1">'+L('pf-dp-acc','To account')+'<select id="pf-dp-acc" style="width:100%;box-sizing:border-box" onchange="_pfDepPreview()">'+portfolio.map(function(a){return '<option value="'+a.id+'"'+(a.id===def.id?' selected':'')+'>'+_esc(a.name)+(a.inst?' · '+_esc(a.inst):'')+'</option>';}).join('')+'</select></div>'+
+      '<div>'+L('pf-dp-amt','Amount')+'<input type="number" id="pf-dp-amt" step="0.01" min="0" placeholder="0.00" oninput="_pfDepPreview()" style="width:100%;box-sizing:border-box"></div>'+
+      '<div>'+L('pf-dp-freq','Repeats')+'<select id="pf-dp-freq" style="width:100%;box-sizing:border-box" onchange="_pfDepPreview()">'+Object.keys(PF_DEP_FREQ).map(function(k){return '<option value="'+k+'">'+PF_DEP_FREQ[k]+'</option>';}).join('')+'</select></div>'+
+      '<div>'+L('pf-dp-dt','<span id="pf-dp-dtl">Date</span>')+'<input type="date" id="pf-dp-dt" style="width:100%;box-sizing:border-box" value="'+_pfToday()+'" oninput="_pfDepPreview()"></div>'+
+      '<div id="pf-dp-endw" style="display:none">'+L('pf-dp-end','Ends (optional)')+'<input type="date" id="pf-dp-end" style="width:100%;box-sizing:border-box" oninput="_pfDepPreview()"></div>'+
+      '<div style="grid-column:1/-1">'+L('pf-dp-note','Note (optional)')+'<input type="text" id="pf-dp-note" maxlength="80" placeholder="e.g. paycheck transfer" style="width:100%;box-sizing:border-box"></div>'+
+    '</div>'+
+    '<div id="pf-dp-prev" aria-live="polite" style="margin-top:.9rem;border:1px solid var(--border);border-radius:10px;padding:.65rem .8rem;font-size:.64rem;line-height:1.75;overflow-wrap:anywhere"></div>'+
+    '<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap"><button class="btn" type="button" onclick="pfDepositClose()">Cancel</button><button class="btn primary" type="button" id="pf-dp-go" onclick="pfConfirmDeposit()">Deposit</button></div>'+
+  '</div>';
+  ov.classList.add('open');
+  _pfDepPreview();
+  setTimeout(function(){const i=el('pf-dp-amt');if(i)i.focus();},30);
+}
+function pfDepositClose(){const ov=el('pf-dep-overlay');if(ov)ov.classList.remove('open');_pfDep=null;}
+function _pfDepRead(){
+  if(!_pfDep)return null;
+  const aid=parseInt((el('pf-dp-acc')||{}).value,10),a=portfolio.find(function(x){return x.id===aid;});if(!a)return null;
+  const amt=parseFloat((el('pf-dp-amt')||{}).value),freq=(el('pf-dp-freq')||{}).value||'once',dt=(el('pf-dp-dt')||{}).value||'',end=freq==='once'?'':((el('pf-dp-end')||{}).value||'');
+  const note=((el('pf-dp-note')||{}).value||'').trim(),t=_pfToday(),cash=_pfCashOf(a),bal=cash?(parseFloat(cash.shares)||0)*(parseFloat(cash.price)||1):0;
+  let err='';
+  if(!(amt>0))err='Enter the deposit amount.';
+  else if(!dt)err=freq==='once'?'Pick the deposit date.':'Pick the first deposit date.';
+  else if(end&&end<dt)err='The end date is before the first deposit.';
+  const p={amt:amt,freq:freq,start:dt,end:end};
+  const due=err?[]:_pfDepDates(p,'',t);
+  return {a:a,amt:amt,freq:freq,dt:dt,end:end,note:note,cash:cash,bal:bal,err:err,due:due,today:t,p:p};
+}
+function _pfDepPreview(){
+  const r=_pfDepRead(),box=el('pf-dp-prev'),go=el('pf-dp-go');if(!r||!box)return;
+  const rec=r.freq!=='once';
+  const ew=el('pf-dp-endw');if(ew)ew.style.display=rec?'':'none';
+  const dl=el('pf-dp-dtl');if(dl)dl.textContent=rec?'First deposit':'Date';
+  if(go){go.disabled=!!r.err;go.textContent=rec?'Schedule deposits':(r.dt>r.today?'Schedule deposit':'Deposit');}
+  if(r.err){box.innerHTML='<span style="color:var(--muted)">'+r.err+'</span>';return;}
+  const row=function(l,v,c){return '<div style="display:flex;justify-content:space-between;gap:1rem"><span style="color:var(--muted)">'+l+'</span><span style="font-family:\'JetBrains Mono\',monospace;text-align:right;'+(c?'color:'+c+';':'')+'font-weight:600">'+v+'</span></div>';};
+  const cashLbl=r.cash?_esc(r.cash.ticker||'cash'):'new *CASH position',nowAmt=r.due.length*r.amt;
+  let h=row('Goes to',_esc(r.a.name)+' · '+cashLbl);
+  if(!rec){
+    h+=row('Deposit',fmtF(_r2(r.amt)),'var(--text)');
+    h+=r.dt>r.today?row('Posts on',_pfDateLbl(r.dt)):row('New cash balance',fmtF(_r2(r.bal+r.amt)),'var(--green)');
+  }else{
+    const nx=_pfDepDates(r.p,r.today,'9999-12-31')[0];
+    h+=row('Schedule',fmtF(_r2(r.amt))+' '+_pfDepDesc(r.p));
+    h+=row('Monthly equivalent',fmtF(_r2(r.amt*({weekly:52,biweekly:26,twicemonthly:24,monthly:12}[r.freq])/12)));
+    if(nowAmt>0)h+=row('Posting now',r.due.length+' × '+fmtF(_r2(r.amt))+' = '+fmtF(_r2(nowAmt)),'var(--green)');
+    h+=row('Next deposit',nx?_pfDateLbl(nx):'—');
+    if(r.end)h+=row('Ends',_pfDateLbl(r.end));
+    if(r.due.length>1||(r.due.length===1&&r.due[0]<r.today))h+='<div style="margin-top:.45rem;color:var(--orange)">'+r.due.length+' deposit'+(r.due.length===1?' falls':'s fall')+' on or before today and will be added to cash now. If '+(r.due.length===1?'it’s':'they’re')+' already in your cash balance, set the first deposit to your next upcoming date.</div>';
+  }
+  box.innerHTML=h;
+}
+function pfConfirmDeposit(){
+  const r=_pfDepRead();if(!r)return;
+  if(r.err){toast(r.err,'var(--red)');return;}
+  const a=r.a;
+  if(r.freq==='once'&&r.dt<=r.today){
+    _pfDepositApply(a,r.amt,r.dt,r.note,null);
+    toast('Deposited '+fmtF(_r2(r.amt))+' to '+a.name+' cash');
+  }else{
+    if(!a.depositPlans)a.depositPlans=[];
+    const p={id:Date.now(),amt:_r2(r.amt),freq:r.freq,start:r.dt,end:r.end,note:r.note,last:'',paused:false};
+    a.depositPlans.push(p);
+    const n=pfPostDueDeposits(true),nx=_pfDepNext(p);
+    toast(r.freq==='once'?'Deposit scheduled for '+_pfDateLbl(r.dt):('Recurring deposit set'+(n?' · '+n+' posted now':'')+(nx?' · next '+_pfDateLbl(nx):'')));
+  }
+  pfDepositClose();pfOpen.add(a.id);renderPortfolio();if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+}
+function pfDelDeposit(accId,depId){
+  const a=portfolio.find(function(x){return x.id===accId;});if(!a||!a.deposits)return;
+  const rec=a.deposits.find(function(x){return x.id===depId;});if(!rec)return;
+  const cash=(a.holdings||[]).find(function(x){return x.id===rec.cashId;}),have=cash?(parseFloat(cash.shares)||0)*(parseFloat(cash.price)||1):0;
+  const short=have+0.005<rec.amount;
+  confirmDelete('Remove the '+fmtF(rec.amount)+' deposit from '+_pfDateLbl(rec.date)+' and take it back out of cash?'+(short?' Cash only holds '+fmtF(_r2(have))+' now, so cash will go to $0.':''),function(){
+    if(cash){cash.shares=_r2x(Math.max(0,(parseFloat(cash.shares)||0)-rec.cashShares));if(rec.newCash&&cash.shares<0.005)a.holdings=a.holdings.filter(function(x){return x.id!==cash.id;});}
+    a.deposits=a.deposits.filter(function(x){return x.id!==depId;});
+    renderPortfolio();if(typeof scheduleAutoSave==='function')scheduleAutoSave();toast('Deposit removed');
+  },'Remove deposit?','Yes, remove');
+}
+function pfDepPlanPause(accId,pid){
+  const a=portfolio.find(function(x){return x.id===accId;});const p=a&&(a.depositPlans||[]).find(function(x){return x.id===pid;});if(!p)return;
+  // Resuming skips the dates missed while paused, so nothing back-posts by surprise.
+  if(p.paused){p.paused=false;const t=_pfToday();if((p.last||'')<t)p.last=t;toast('Recurring deposit resumed');}
+  else{p.paused=true;toast('Recurring deposit paused');}
+  renderPortfolio();if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+}
+function pfDepPlanDel(accId,pid){
+  confirmDelete('Stop this recurring deposit? Deposits already posted stay in cash.',function(){
+    const a=portfolio.find(function(x){return x.id===accId;});if(!a)return;
+    a.depositPlans=(a.depositPlans||[]).filter(function(x){return x.id!==pid;});
+    renderPortfolio();if(typeof scheduleAutoSave==='function')scheduleAutoSave();toast('Recurring deposit stopped');
+  },'Stop recurring deposit?','Yes, stop');
+}
+function _pfDepositsHtml(a){
+  const D=a.deposits||[],PL=a.depositPlans||[];if(!D.length&&!PL.length)return '';
+  const yr=String(new Date().getFullYear()),ytd=D.reduce(function(s,x){return s+(String(x.date||'').slice(0,4)===yr?(parseFloat(x.amount)||0):0);},0);
+  const t=_pfToday(),live=PL.filter(function(p){return !(p.end&&p.end<t&&!_pfDepNext(p))&&!(p.freq==='once'&&(p.last||'')>=p.start);});
+  const plans=live.length?'<div style="display:flex;flex-direction:column;gap:.35rem;margin:.45rem 0">'+live.map(function(p){const nx=_pfDepNext(p);
+      return '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:.4rem .7rem;border:1px solid var(--border);border-radius:8px;padding:.4rem .6rem;font-size:.6rem'+(p.paused?';opacity:.6;border-style:dashed':'')+'">'+
+        '<span style="font-family:\'JetBrains Mono\',monospace;font-weight:600;color:var(--green)">'+fmtF(_r2(p.amt))+'</span>'+
+        '<span style="flex:1;min-width:8rem">'+_pfDepDesc(p)+(p.note?' · <span style="color:var(--muted)">'+_esc(p.note)+'</span>':'')+'</span>'+
+        '<span style="color:var(--muted)">'+(p.paused?'Paused':(nx?'Next '+_pfDateLbl(nx):'No more dates'))+'</span>'+
+        (p.freq==='once'?'':'<button class="btn sm" type="button" onclick="pfDepPlanPause('+a.id+','+p.id+')">'+(p.paused?'Resume':'Pause')+'</button>')+
+        '<button class="btn sm" type="button" onclick="pfDepPlanDel('+a.id+','+p.id+')" title="Stop this '+(p.freq==='once'?'scheduled':'recurring')+' deposit">'+(p.freq==='once'?'Cancel':'Stop')+'</button></div>';}).join('')+'</div>':'';
+  const hist=D.length?'<div class="table-wrap" style="margin-top:.4rem"><table class="data-table"><thead><tr><th>Date</th><th class="num">Amount</th><th>Type</th><th>Note</th><th></th></tr></thead><tbody>'+
+    D.map(function(d){return '<tr><td>'+_esc(d.date||'')+'</td><td class="num" style="color:var(--green);font-weight:600">+'+fmtF(_r2(d.amount))+'</td><td style="color:var(--muted)">'+(d.planId?'Recurring':'One time')+'</td><td style="color:var(--muted)">'+_esc(d.note||'')+'</td><td style="text-align:right"><button class="btn sm" type="button" onclick="pfDelDeposit('+a.id+','+d.id+')" title="Remove this deposit and take it back out of cash">Remove</button></td></tr>';}).join('')+
+    '</tbody></table></div>':'';
+  return '<details class="pf-deps" style="margin-top:.6rem"'+(live.length&&!D.length?' open':'')+'><summary style="font-size:.6rem;color:var(--muted);cursor:pointer">Deposits · '+D.length+(live.length?' · '+live.length+' scheduled':'')+' · deposited '+yr+': <span style="color:var(--green);font-weight:600">'+fmtF(_r2(ytd))+'</span></summary>'+plans+hist+'</details>';
+}
 // ===== Investment tab v2 — "Briefing" layout =====
 // Hero (value + headline stats) beside one switchable visual (value over time ⇄ holdings map),
 // "worth your attention" insights, consolidated holdings (combined / by account) with
@@ -5921,7 +6201,7 @@ function _pvInsights(P,tot){
 }
 const _PV_IC={cash:'<rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',pie:'<path d="M21 12A9 9 0 1 1 12 3v9z"/><path d="M15 3.5A9 9 0 0 1 20.5 9H15z"/>',down:'<path d="M3 7l6 6 4-4 8 8"/><path d="M21 11v6h-6"/>'};
 // ── Holding rows ──
-function _pvActs(a,h){return '<span class="pv-acts">'+(_hIsCash(h)?'':'<button type="button" class="pf-sellbtn" onclick="event.stopPropagation();pfSell('+a.id+','+h.id+')" aria-label="Sell '+_esc(h.ticker||h.name||'holding')+' in '+_esc(_pvAccShort(a))+'">Sell</button>')+
+function _pvActs(a,h){return '<span class="pv-acts">'+(_hIsCash(h)?'<button type="button" class="pf-sellbtn pf-depbtn" onclick="event.stopPropagation();pfDeposit('+a.id+')" aria-label="Deposit funds to '+_esc(_pvAccShort(a))+' cash">Deposit</button>':'<button type="button" class="pf-sellbtn" onclick="event.stopPropagation();pfSell('+a.id+','+h.id+')" aria-label="Sell '+_esc(h.ticker||h.name||'holding')+' in '+_esc(_pvAccShort(a))+'">Sell</button>')+
   '<button type="button" class="pv-ib" onclick="event.stopPropagation();pfEditHolding('+a.id+','+h.id+')" aria-label="Edit '+_esc(h.ticker||'holding')+'" title="Edit">'+icon('pencil')+'</button>'+
   '<button type="button" class="pv-ib" onclick="event.stopPropagation();pfDelHolding('+a.id+','+h.id+')" aria-label="Delete '+_esc(h.ticker||'holding')+'" title="Delete">'+icon('trash')+'</button></span>';}
 function _pvRow(o){ // o:{k,name,v,w,day,dp,hasPc,g,gp,cash,attrs,tail,sub}
@@ -5947,9 +6227,9 @@ function _pvHoldingsHtml(P,ui,tot){
   }else{
     body=portfolio.map(function(a){const H=(a.holdings||[]).slice().sort(function(x,y){return _hVal(y)-_hVal(x);}),av=H.reduce(function(s,h){return s+_hVal(h);},0),ag=H.reduce(function(s,h){return s+(_hIsCash(h)?0:_hGain(h));},0),ab=H.reduce(function(s,h){return s+(_hIsCash(h)?0:_hInv(h));},0);
       return '<div class="pv-ghead"><div><b>'+_esc(a.name)+'</b><span>'+_esc([a.inst,a.tax].filter(Boolean).join(' · '))+'</span></div><div class="pv-gr"><span class="pv-num">'+_pvM(av)+'</span>'+(ab>0?'<span class="pv-num" style="color:'+_pvC(ag)+'">'+_pvS(ag)+' · '+_pvP(ag/ab*100,1)+'</span>':'')+
-        '<button type="button" class="pv-ib" onclick="pvFormOpen('+a.id+')" aria-label="Add holding to '+_esc(a.name)+'" title="Add holding">'+icon('plus')+'</button><button type="button" class="pv-ib" onclick="pfEditAccount('+a.id+')" aria-label="Edit account '+_esc(a.name)+'" title="Edit account">'+icon('pencil')+'</button><button type="button" class="pv-ib" onclick="pfDelAccount('+a.id+')" aria-label="Delete account '+_esc(a.name)+'" title="Delete account">'+icon('trash')+'</button></div></div>'+
+        '<button type="button" class="pf-sellbtn pf-depbtn" onclick="pfDeposit('+a.id+')" aria-label="Deposit funds to '+_esc(a.name)+'" title="Deposit funds to this account cash">Deposit</button><button type="button" class="pv-ib" onclick="pvFormOpen('+a.id+')" aria-label="Add holding to '+_esc(a.name)+'" title="Add holding">'+icon('plus')+'</button><button type="button" class="pv-ib" onclick="pfEditAccount('+a.id+')" aria-label="Edit account '+_esc(a.name)+'" title="Edit account">'+icon('pencil')+'</button><button type="button" class="pv-ib" onclick="pfDelAccount('+a.id+')" aria-label="Delete account '+_esc(a.name)+'" title="Delete account">'+icon('trash')+'</button></div></div>'+
         (H.length?H.map(function(h){const c=_hIsCash(h),v=_hVal(h),dd=_hToday(h),inv=_hInv(h),g=c?0:_hGain(h);return _pvRow({k:c?'CASH':(h.ticker||'—'),name:c?'Cash & core sweep':(h.name||''),v:v,w:av>0?v/av*100:0,day:dd,dp:(v-dd)>0?dd/(v-dd)*100:0,hasPc:parseFloat(h.prevClose)>0,g:g,gp:inv>0?g/inv*100:0,cash:c,tail:_pvActs(a,h)});}).join(''):'<div class="pv-empty">No holdings yet. <button type="button" class="pv-lnk" onclick="pvFormOpen('+a.id+')">Add one →</button></div>')+
-        (typeof _pfSalesHtml==='function'?_pfSalesHtml(a):'');}).join('');
+        (typeof _pfSalesHtml==='function'?_pfSalesHtml(a):'')+(typeof _pfDepositsHtml==='function'?_pfDepositsHtml(a):'');}).join('');
   }
   return '<div class="pv-tbl" data-nofit><div class="pv-tblin">'+head+body+'</div></div>';
 }
@@ -6014,7 +6294,7 @@ function pvAcctForm(open){_pvAcctForm=!!open;const p=el('pf-acctform');if(!p)ret
   if(_pvAcctForm)setTimeout(function(){const n=el('pf-name');if(n){n.focus();p.scrollIntoView({behavior:'smooth',block:'center'});}},30);}
 // ── Main render ──
 function renderPortfolio(){
-  const host=el('pf-v2');if(!host)return;_pfSyncIds();_pvFormDraft();
+  const host=el('pf-v2');if(!host)return;_pfSyncIds();if(typeof pfPostDueDeposits==='function')pfPostDueDeposits();_pvFormDraft();
   const ui=_pvUI(),m=pfMetrics(),tot=m.value,P=_pvPositions(tot);
   const nPos=P.filter(function(p){return !p.cash;}).length,yr=new Date().getFullYear();
   const st=(typeof MarketData!=='undefined'&&MarketData.status)?MarketData.status():{};const upd=st&&st.lastSuccess?new Date(st.lastSuccess):null;
@@ -6023,7 +6303,7 @@ function renderPortfolio(){
   const cg=typeof _pfCAGR==='function'?_pfCAGR():null;
   const head='<div class="pv-top"><div><div class="pv-eye">Investment portfolio</div><div class="pv-mut">'+portfolio.length+' account'+(portfolio.length===1?'':'s')+' · '+nPos+' position'+(nPos===1?'':'s')+' · <span id="pf-sync-status">'+asOf+'</span></div></div>'+
     '<div class="pv-btns"><button type="button" class="btn" id="pf-refresh-btn" aria-label="Refresh prices" onclick="pfRefreshPrices()">'+icon('refresh')+'<span>Refresh prices</span></button><button type="button" class="btn" aria-label="Add account" onclick="pvAcctForm(true)">'+icon('plus')+'<span>Add account</span></button>'+
-    (portfolio.length?'<button type="button" class="btn pv-pri" aria-label="Buy shares" onclick="pvFormOpen()">'+icon('plus')+'<span>Buy shares</span></button>':'')+'</div></div>';
+    (portfolio.length?'<button type="button" class="btn" aria-label="Deposit funds" onclick="pfDeposit()">'+icon('plus')+'<span>Deposit</span></button>':'')+(portfolio.length?'<button type="button" class="btn pv-pri" aria-label="Buy shares" onclick="pvFormOpen()">'+icon('plus')+'<span>Buy shares</span></button>':'')+'</div></div>';
   if(!portfolio.length){host.innerHTML=head+'<div class="pv-card pv-welcome"><div class="pv-big" style="font-size:40px">Start your portfolio</div><p class="pv-mut">Add an investment account — a brokerage, Roth IRA, HSA — then add holdings. Prices sync once per trading day, and balances flow to the Accounts tab.</p><button type="button" class="btn pv-pri" onclick="pvAcctForm(true)">'+icon('plus')+'<span>Add your first account</span></button></div>';pvAcctForm(true);_pvAfter();return;}
   const cents=_pvM(tot).split('.');
   const hero='<div class="pv-hl"><div><div class="pv-mut">Total value</div><div class="pv-big">'+cents[0]+'<span>.'+(cents[1]||'00')+'</span></div>'+
@@ -6266,12 +6546,81 @@ function _bvAhead(){
   const xt=pick.map(function(i,k){return '<span style="left:'+(X(i)/10).toFixed(2)+'%;transform:translateX('+(k===0?'0':k===pick.length-1?'-100%':'-50%')+')">'+R[i].dt.toLocaleDateString('en-US',{month:'short',year:'2-digit'}).replace(' ',' ’')+'</span>';}).join('');
   window._bvCF={R:R,X:X};
   return {read:'<span>'+(end.cum>=0?'<span class="pv-num bv-gold">'+_pvM(end.cum,0)+'</span> <span class="pv-mut">piles up by '+_bvMon(end.iso)+' if nothing is invested</span>':'<span class="pv-num" style="color:var(--red)">'+_pvM(end.cum,0)+'</span> <span class="pv-mut">short by '+_bvMon(end.iso)+'</span>')+'</span><span class="pv-mut">bars = monthly surplus · line = running total</span>',
-    body:'<div class="pv-plot bv-plot" id="bv-plot" onmousemove="bvHover(event)" onmouseleave="bvHoverOff()" role="img" aria-label="Monthly surplus and running total, '+_esc(_bvMon(R[0].iso)+' to '+_bvMon(end.iso))+'">'+yl+'<svg viewBox="0 0 1000 '+H+'" preserveAspectRatio="none" aria-hidden="true">'+bars+'<path d="'+cum+'" fill="none" stroke="var(--accent)" stroke-width="2.2" vector-effect="non-scaling-stroke"/></svg>'+runs+'<div class="pv-rule" id="bv-rule"></div><div class="pv-tip" id="bv-tip"></div></div><div class="pv-xl">'+xt+'</div>'};
+    body:'<div class="pv-plot bv-plot" id="bv-plot" onmousemove="bvHover(event)" onmouseleave="bvHoverOff()" onclick="bvClick(event)" tabindex="0" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();bvDiffOpen(0)}" style="cursor:pointer" role="button" aria-label="Monthly surplus and running total — click a bar to see what changed vs the month before, '+_esc(_bvMon(R[0].iso)+' to '+_bvMon(end.iso))+'">'+yl+'<svg viewBox="0 0 1000 '+H+'" preserveAspectRatio="none" aria-hidden="true">'+bars+'<path d="'+cum+'" fill="none" stroke="var(--accent)" stroke-width="2.2" vector-effect="non-scaling-stroke"/></svg>'+runs+'<div class="pv-rule" id="bv-rule"></div><div class="pv-tip" id="bv-tip"></div></div><div class="pv-xl">'+xt+'</div>'};
 }
 function bvHover(e){const box=el('bv-plot'),C=window._bvCF;if(!box||!C)return;const r=box.getBoundingClientRect(),f=(e.clientX-r.left)/r.width*1000;let best=0;C.R.forEach(function(x,i){if(Math.abs(C.X(i)-f)<Math.abs(C.X(best)-f))best=i;});
   const row=C.R[best],x=C.X(best)/10,rule=el('bv-rule'),tip=el('bv-tip');rule.style.left=x+'%';rule.style.display='block';
-  tip.innerHTML='<b>'+row.dt.toLocaleDateString('en-US',{month:'long',year:'numeric'})+'</b><span>Income <span class="pv-num">'+_pvM(row.inc)+'</span></span><span>Out <span class="pv-num">'+_pvM(row.exp)+'</span></span><span>Net <span class="pv-num" style="color:'+_pvC(row.net)+'">'+_pvS(row.net)+'</span></span><span class="pv-mut">Running total <span class="pv-num">'+_pvM(row.cum,0)+'</span></span>'+(row.events&&row.events.length?'<span class="pv-mut">'+row.events.map(function(v){return _esc(v.label);}).join(' · ')+'</span>':'');
+  tip.innerHTML='<b>'+row.dt.toLocaleDateString('en-US',{month:'long',year:'numeric'})+'</b><span>Income <span class="pv-num">'+_pvM(row.inc)+'</span></span><span>Out <span class="pv-num">'+_pvM(row.exp)+'</span></span><span>Net <span class="pv-num" style="color:'+_pvC(row.net)+'">'+_pvS(row.net)+'</span></span><span class="pv-mut">Running total <span class="pv-num">'+_pvM(row.cum,0)+'</span></span>'+(row.events&&row.events.length?'<span class="pv-mut">'+row.events.map(function(v){return _esc(v.label);}).join(' · ')+'</span>':'')+'<span class="pv-mut" style="color:var(--accent)">Click for what changed</span>';
   tip.style.display='flex';tip.style.left=x+'%';tip.style.transform='translateX('+(x>62?'-105%':'12px')+')';}
+// ── Months ahead: click a bar → what changed vs the month before ──
+// Diffs ledgerMonth(this month) against ledgerMonth(previous month) line by line — income,
+// savings, every expense item, every debt payment — so a big swing in the bar can be traced
+// to the exact lines that moved. Effect on net: income up = +, any outflow up = −.
+let _bvDiffI=null;
+function _bvPrevISO(iso){const d=new Date(iso+'T00:00:00');return _pfISO(new Date(d.getFullYear(),d.getMonth()-1,1));}
+function _bvLedgerLines(L){
+  const out={};const add=function(sec,key,name,amt,sign,extra){const k=sec+'|'+key;if(out[k]){out[k].amt+=amt;return;}out[k]=Object.assign({sec:sec,key:key,name:name,amt:amt,sign:sign},extra||{});};
+  L.income.forEach(function(r){add('Income',r.key,r.name,+r.amt||0,1);});
+  L.savings.forEach(function(r){add('Savings',r.key,r.name,+r.amt||0,-1);});
+  L.groups.forEach(function(g){g.items.forEach(function(x){add(g.cat,x.key,x.name,+x.amt||0,-1);});});
+  L.debts.forEach(function(d){add('Debt','d:'+d.id,d.name,+d.amt||0,-1,{min:d.min,extra:d.extra||0,target:!!d.target});});
+  (L.debtItems||[]).forEach(function(x){add('Debt',x.key,x.name,+x.amt||0,-1);});
+  return out;
+}
+function bvMonthDiff(iso){
+  const pIso=_bvPrevISO(iso),A=ledgerMonth(pIso),B=ledgerMonth(iso),la=_bvLedgerLines(A),lb=_bvLedgerLines(B);
+  const keys={};Object.keys(la).concat(Object.keys(lb)).forEach(function(k){keys[k]=1;});
+  const rows=[];
+  Object.keys(keys).forEach(function(k){const a=la[k],b=lb[k],va=a?a.amt:0,vb=b?b.amt:0,d=vb-va;if(Math.abs(d)<0.005)return;
+    const r=b||a;rows.push({sec:r.sec,name:r.name,was:va,now:vb,d:d,eff:d*r.sign,tag:!a||Math.abs(va)<0.005?'new':(!b||Math.abs(vb)<0.005?'ended':''),a:a,b:b});});
+  rows.sort(function(x,y){return Math.abs(y.eff)-Math.abs(x.eff);});
+  return {iso:iso,pIso:pIso,A:A,B:B,rows:rows,dNet:B.totals.net-A.totals.net};
+}
+function _bvDiffNote(r){
+  // Explain debt-line moves that come from the pay-schedule pool shifting between debts.
+  if(r.sec!=='Debt')return '';
+  const a=r.a||{},b=r.b||{};
+  if(r.tag==='ended')return 'paid off — payment stops';
+  if(r.tag==='new')return 'payment starts';
+  if((a.extra||0)>0.005&&!((b.extra||0)>0.005))return 'extra payments moved off this debt';
+  if(!((a.extra||0)>0.005)&&(b.extra||0)>0.005)return 'now gets the extra payments';
+  if(Math.abs((b.extra||0)-(a.extra||0))>0.005)return 'extra payment changed';
+  return '';
+}
+function bvDiffOpen(i){
+  const R=window._cfRows;if(!R||!R[i])return;_bvDiffI=i;
+  const row=R[i],D=bvMonthDiff(row.iso),mon=function(iso){return new Date(iso+'T00:00:00').toLocaleDateString('en-US',{month:'long',year:'numeric'});};
+  let ov=el('bv-diff-overlay');
+  if(!ov){ov=document.createElement('div');ov.id='bv-diff-overlay';ov.className='modal-overlay';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','bv-df-title');document.body.appendChild(ov);
+    ov.addEventListener('click',function(e){if(e.target===ov)bvDiffClose();});
+    document.addEventListener('keydown',function(e){if(!ov.classList.contains('open'))return;if(e.key==='Escape')bvDiffClose();else if(e.key==='ArrowLeft'&&_bvDiffI>0)bvDiffOpen(_bvDiffI-1);else if(e.key==='ArrowRight'&&window._cfRows&&_bvDiffI<window._cfRows.length-1)bvDiffOpen(_bvDiffI+1);});}
+  const T0=D.A.totals,T1=D.B.totals,M=function(v){return _pvM(v);},S=function(v){return (v>=0?'+':'−')+_pvM(Math.abs(v));};
+  const tile=function(l,a,b,good){const d=b-a,c=Math.abs(d)<0.005?'var(--muted)':((d>0)===good?'var(--green)':'var(--red)');
+    return '<div style="border:1px solid var(--border);border-radius:10px;padding:.5rem .65rem;min-width:0"><div style="font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">'+l+'</div><div class="pv-num" style="font-size:.85rem;font-weight:600;color:var(--text)">'+M(b)+'</div><div class="pv-num" style="font-size:.6rem;color:'+c+'">'+(Math.abs(d)<0.005?'no change':S(d))+'</div></div>';};
+  const evs=(row.events||[]).map(function(v){return _esc(v.label);});
+  const big=D.rows.filter(function(r){return Math.abs(r.eff)>=0.5;});
+  const explained=big.reduce(function(s,r){return s+r.eff;},0)+D.rows.filter(function(r){return Math.abs(r.eff)<0.5;}).reduce(function(s,r){return s+r.eff;},0),gap=D.dNet-explained;
+  const top=big[0];
+  let head='';
+  if(!big.length)head='<div class="pv-mut" style="font-size:.66rem">Nothing changed from '+mon(D.pIso)+' — every line is the same.</div>';
+  else head='<div style="font-size:.68rem;line-height:1.6">Net is <b class="pv-num" style="color:'+_pvC(D.dNet)+'">'+S(D.dNet)+'</b> vs '+mon(D.pIso)+'. '+
+    (Math.abs(top.eff)>=Math.abs(D.dNet)*0.5&&Math.abs(D.dNet)>0.5?'Biggest driver: <b>'+_esc(top.name)+'</b> ('+_esc(top.sec)+') <span class="pv-num" style="color:'+_pvC(top.eff)+'">'+S(top.eff)+'</span>.':'Spread across '+big.length+' line'+(big.length===1?'':'s')+'.')+'</div>';
+  const tr=big.map(function(r){const note=_bvDiffNote(r)||(r.tag==='new'?'new this month':r.tag==='ended'?'ends — $0 this month':'');
+    return '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;padding:.5rem .7rem;border-top:1px solid var(--border)"><div style="min-width:0;flex:1"><div style="font-weight:600;font-size:.66rem;overflow-wrap:anywhere">'+_esc(r.name)+'</div><div style="font-size:.56rem;color:var(--muted);overflow-wrap:anywhere">'+_esc(r.sec)+(note?' · '+_esc(note):'')+'</div></div><div style="text-align:right;flex:none"><div class="pv-num" style="font-weight:600;font-size:.7rem;color:'+_pvC(r.eff)+'">'+S(r.eff)+'</div><div class="pv-num" style="font-size:.56rem;color:var(--muted);white-space:nowrap">'+M(r.was)+' → '+M(r.now)+'</div></div></div>';}).join('');
+  const nav='<div style="display:flex;gap:.35rem"><button class="btn sm" type="button" '+(i>0?'onclick="bvDiffOpen('+(i-1)+')"':'disabled')+' aria-label="Previous month">‹</button><button class="btn sm" type="button" '+(i<R.length-1?'onclick="bvDiffOpen('+(i+1)+')"':'disabled')+' aria-label="Next month">›</button></div>';
+  ov.innerHTML='<div class="modal" style="max-width:620px;width:calc(100% - 32px);box-sizing:border-box">'+
+    '<div class="modal-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.8rem"><div style="min-width:0"><h2 id="bv-df-title" style="font-size:1.1rem;margin:0">'+mon(row.iso)+' vs '+mon(D.pIso)+'</h2><div style="font-size:.58rem;color:var(--muted);margin-top:.25rem">What changed from the month before · ← → to step months</div></div>'+
+    '<div style="display:flex;gap:.5rem;align-items:center">'+nav+'<button class="modal-close" type="button" onclick="bvDiffClose()" aria-label="Close">&times;</button></div></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.5rem;margin-bottom:.75rem">'+tile('Income',T0.inc,T1.inc,true)+tile('Out',T0.out,T1.out,false)+tile('Net',T0.net,T1.net,true)+'</div>'+
+    head+
+    (evs.length?'<div style="font-size:.6rem;color:var(--muted);margin-top:.4rem">Events this month: '+evs.join(' · ')+'</div>':'')+
+    (big.length?'<div style="margin-top:.65rem;max-height:52vh;overflow-y:auto;border:1px solid var(--border);border-radius:10px"><div style="display:flex;justify-content:space-between;gap:.75rem;padding:.4rem .7rem;font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em"><span>Line</span><span>Effect on net · '+_esc(new Date(D.pIso+'T00:00:00').toLocaleDateString('en-US',{month:'short'}))+' → '+_esc(row.dt.toLocaleDateString('en-US',{month:'short'}))+'</span></div>'+tr+'</div>':'')+
+    (Math.abs(gap)>=0.5?'<div style="font-size:.58rem;color:var(--orange);margin-top:.45rem">'+S(gap)+' of the change isn’t tied to a single line (rounding or a total-level adjustment).</div>':'')+
+  '</div>';
+  ov.classList.add('open');
+}
+function bvDiffClose(){const ov=el('bv-diff-overlay');if(ov)ov.classList.remove('open');_bvDiffI=null;}
+function bvClick(e){const box=el('bv-plot'),C=window._bvCF;if(!box||!C)return;const r=box.getBoundingClientRect(),f=(e.clientX-r.left)/r.width*1000;let best=0;C.R.forEach(function(x,i){if(Math.abs(C.X(i)-f)<Math.abs(C.X(best)-f))best=i;});bvDiffOpen(best);}
 function bvHoverOff(){['bv-rule','bv-tip'].forEach(function(i){const e=el(i);if(e)e.style.display='none';});}
 function _bvPay(){
   const bills=(typeof _planBills==='function')?_planBills():[],N=(typeof _payCount==='function')?_payCount():1,pcs=(typeof _combinedPaychecks==='function')?_combinedPaychecks():[];
@@ -8569,21 +8918,497 @@ function trConfirm(){
   if(_tr.pxDate)_tspHistPut(_tr.pxDate,prices);
   if(useTx&&typeof _tspSetAsOf==='function')_tspSetAsOf(_tr.pxDate||_tr.date);
   tspIftLog.unshift({id:Date.now(),date:_tr.date,pxDate:_tr.pxDate||_tr.date,total:_r2(C.tot),before:before,after:after,prices:prices,from:from,to:to});
-  tspIftLog=tspIftLog.slice(0,40);
+  tspIftLog=tspIftLog.slice(0,60);
   tspRebalanceClose();renderTspFundRows();renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();
   toast('Transfer recorded · '+_pvM(C.tot,0)+' rebalanced at '+_trLbl(tspIftLog[0].pxDate)+' closes');
 }
 function tspIftUndo(){
-  const t=tspIftLog[0];if(!t)return;
-  confirmDelete('Undo the '+_trLbl(t.date)+' transfer and put your shares back the way they were?',function(){Object.keys(t.before).forEach(function(k){tspFunds[k]=tspFunds[k]||{sh:0,px:0};tspFunds[k].sh=t.before[k];});tspIftLog.shift();renderTspFundRows();renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();toast('Transfer undone');},'Undo transfer?','Yes, undo');
+  const t=tspIftLog.find(function(x){return !x.past;});if(!t)return;
+  confirmDelete('Undo the '+_trLbl(t.date)+' transfer and put your shares back the way they were?',function(){Object.keys(t.before).forEach(function(k){tspFunds[k]=tspFunds[k]||{sh:0,px:0};tspFunds[k].sh=t.before[k];});tspIftLog=tspIftLog.filter(function(x){return x!==t;});renderTspFundRows();renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();toast('Transfer undone');},'Undo transfer?','Yes, undo');
 }
 function renderTspIftLog(){
+  if(typeof renderTspScore==='function')renderTspScore();
   const h=el('tsp-ift-log');if(!h)return;
   if(!tspIftLog.length){h.innerHTML='';return;}
+  const undo=tspIftLog.find(function(x){return !x.past;});
   const mix=function(o){return Object.keys(o).filter(function(k){return o[k]>0.05;}).sort(function(a,b){return o[b]-o[a];}).map(function(k){return _tspName(k).replace(' Fund','')+' '+Math.round(o[k])+'%';}).join(' · ');};
-  h.innerHTML='<details'+(tspIftLog.length?' open':'')+'><summary>Transfers · '+tspIftLog.length+'</summary>'+tspIftLog.slice(0,8).map(function(t,i){return '<div class="tr-log"><span><b>'+_trLbl(t.date)+'</b> · '+_pvM(t.total,0)+'<em>'+mix(t.from)+' → '+mix(t.to)+'</em></span>'+(i===0?'<button type="button" class="btn sm" onclick="tspIftUndo()">Undo</button>':'')+'</div>';}).join('')+'</details>';
+  h.innerHTML='<details'+(tspIftLog.length?' open':'')+'><summary>Transfers · '+tspIftLog.length+'</summary>'+tspIftLog.slice(0,8).map(function(t){const f=Object.keys(t.before||{}).filter(function(k){return (parseFloat(t.before[k])||0)-(parseFloat((t.after||{})[k])||0)>1e-6;}),b=Object.keys(t.after||{}).filter(function(k){return (parseFloat(t.after[k])||0)-(parseFloat((t.before||{})[k])||0)>1e-6;});
+    return '<div class="tr-log"><span><b>'+_trLbl(t.date)+'</b> · '+_pvM(t.total,0)+'<em>'+(t.past?f.map(function(k){return _tspName(k).replace(' Fund','');}).join(' + ')+' → '+b.map(function(k){return _tspName(k).replace(' Fund','');}).join(' + ')+' · '+f.map(function(k){return ((parseFloat(t.before[k])||0)-(parseFloat((t.after||{})[k])||0)).toLocaleString('en-US',{maximumFractionDigits:2})+' sh';}).join(' + ')+' · added as a past transfer':mix(t.from)+' → '+mix(t.to))+'</em></span>'+
+      (t.past?'<button type="button" class="btn sm" onclick="tsPastDel(\''+t.id+'\')">Remove</button>':(t===undo?'<button type="button" class="btn sm" onclick="tspIftUndo()">Undo</button>':''))+'</div>';}).join('')+
+    '<div style="padding:8px 0 2px;border-top:1px solid var(--border)"><button type="button" class="pv-lnk" style="font-size:12.5px" onclick="tsPastOpen()">+ Add a past transfer</button></div></details>';
 }
 
+
+// ── Past transfers (log only) ──
+// Adds an interfund transfer that already happened, so the scorecard can grade it. It goes into
+// tspIftLog in date order with past:true and NEVER changes current fund shares (those already
+// reflect it). Prices come from saved TSP closes for that date, TSP.gov, or typed in.
+let _tpx=null;
+function tsPastOpen(){
+  _tpx={pxDate:'',how:''};
+  let ov=el('tpx-overlay');
+  if(!ov){ov=document.createElement('div');ov.id='tpx-overlay';ov.className='modal-overlay';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','tpx-title');document.body.appendChild(ov);
+    ov.addEventListener('click',function(e){if(e.target===ov)tsPastClose();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open'))tsPastClose();});}
+  const opt=function(sel){return TSP_FUNDS.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===sel?' selected':'')+'>'+_esc(f[1])+'</option>';}).join('');};
+  const L=function(f,t){return '<label class="pf-lbl" style="display:block" for="'+f+'">'+t+'</label>';},W='width:100%;box-sizing:border-box';
+  ov.innerHTML='<div class="modal" style="max-width:500px">'+
+    '<div class="modal-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.9rem"><div><h2 id="tpx-title" style="font-size:1.1rem;margin:0">Add a past transfer</h2>'+
+    '<div style="font-size:.6rem;color:var(--muted);margin-top:.25rem">For the scorecard only. Your current fund shares don’t change.</div></div><button class="modal-close" type="button" onclick="tsPastClose()" aria-label="Close">&times;</button></div>'+
+    '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem .7rem">'+
+      '<div>'+L('tpx-dt','Transfer date')+'<input type="date" id="tpx-dt" max="'+_trToday()+'" style="'+W+'" onchange="tsPastPx()"></div><div></div>'+
+      '<div>'+L('tpx-f','Moved out of')+'<select id="tpx-f" style="'+W+'" onchange="tsPastPx()">'+opt('C')+'</select></div>'+
+      '<div>'+L('tpx-t','Moved into')+'<select id="tpx-t" style="'+W+'" onchange="tsPastPx()">'+opt('G')+'</select></div>'+
+      '<div>'+L('tpx-sh','Shares sold')+'<input type="number" id="tpx-sh" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
+      '<div>'+L('tpx-hb','Shares you had in it')+'<input type="number" id="tpx-hb" step="0.0001" min="0" placeholder="Same — moved it all" style="'+W+'" oninput="tsPastPrev()"></div>'+
+      '<div>'+L('tpx-pf','<span id="tpx-pfl">Sell price</span>')+'<input type="number" id="tpx-pf" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
+      '<div>'+L('tpx-pt','<span id="tpx-ptl">Buy price</span>')+'<input type="number" id="tpx-pt" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
+    '</div>'+
+    '<div id="tpx-pxs" style="font-size:.58rem;color:var(--muted);margin-top:.45rem;min-height:1.2em"></div>'+
+    '<label style="display:flex;align-items:center;gap:.45rem;margin-top:.7rem;font-size:.66rem;font-weight:600;cursor:pointer"><input type="checkbox" id="tpx-back" onchange="tsPastBack()"> I moved back into <span id="tpx-bkf">C Fund</span> (round trip)</label>'+
+    '<div id="tpx-bw" style="display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem .7rem;margin-top:.55rem">'+
+      '<div>'+L('tpx-bdt','Moved back on')+'<input type="date" id="tpx-bdt" max="'+_trToday()+'" style="'+W+'" onchange="tsPastPx2()"></div><div></div>'+
+      '<div>'+L('tpx-bpt','<span id="tpx-bptl">Sell price</span>')+'<input type="number" id="tpx-bpt" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
+      '<div>'+L('tpx-bpf','<span id="tpx-bpfl">Buy-back price</span>')+'<input type="number" id="tpx-bpf" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
+      '<div id="tpx-bpxs" style="grid-column:1/-1;font-size:.58rem;color:var(--muted)"></div>'+
+    '</div>'+
+    '<div id="tpx-prev" aria-live="polite" style="margin-top:.6rem;border:1px solid var(--border);border-radius:10px;padding:.6rem .8rem;font-size:.64rem;line-height:1.75;overflow-wrap:anywhere"></div>'+
+    '<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap"><button class="btn" type="button" onclick="tsPastClose()">Cancel</button><button class="btn primary" type="button" id="tpx-go" onclick="tsPastSave()">Add transfer</button></div>'+
+  '</div>';
+  ov.classList.add('open');tsPastPx();
+  setTimeout(function(){const d=el('tpx-dt');if(d)d.focus();},30);
+}
+function tsPastClose(){const ov=el('tpx-overlay');if(ov)ov.classList.remove('open');_tpx=null;}
+// fill prices from saved closes for the chosen date (only into empty boxes or ones we filled)
+function tsPastPx(){
+  if(!_tpx)return;const d=(el('tpx-dt')||{}).value,f=(el('tpx-f')||{}).value,t=(el('tpx-t')||{}).value,box=el('tpx-pxs');
+  const lf=el('tpx-pfl'),lt=el('tpx-ptl');if(lf)lf.textContent=_tsShort(f)+' sell price';if(lt)lt.textContent=_tsShort(t)+' buy price';
+  const bk=el('tpx-bkf'),b1=el('tpx-bptl'),b2=el('tpx-bpfl');if(bk)bk.textContent=_tspName(f);if(b1)b1.textContent=_tsShort(t)+' sell price';if(b2)b2.textContent=_tsShort(f)+' buy-back price';
+  if(el('tpx-back')&&el('tpx-back').checked)tsPastPx2(true);
+  if(!d){if(box)box.textContent='';tsPastPrev();return;}
+  const P=tspPricesFor(d),pf=el('tpx-pf'),pt=el('tpx-pt');
+  const exact=P&&(P.how==='exact'||P.how==='next')&&_tsPx(P.prices,f)>0&&_tsPx(P.prices,t)>0;
+  if(exact){
+    if(!pf.value||pf.dataset.auto==='1'){pf.value=_tsPx(P.prices,f);pf.dataset.auto='1';}
+    if(!pt.value||pt.dataset.auto==='1'){pt.value=_tsPx(P.prices,t);pt.dataset.auto='1';}
+    _tpx.pxDate=P.date;
+    box.innerHTML='Closing prices from '+_trLbl(P.date)+(P.how==='next'?' (next trading day)':'')+'. Type over them if your confirmation shows different prices.';
+  }else{
+    _tpx.pxDate=d;
+    box.innerHTML='No saved closes for '+_trLbl(d)+'. <button type="button" class="pv-lnk" id="tpx-get" onclick="tsPastFetch()">Get them from TSP.gov</button> or type the prices from your transaction history.';
+  }
+  tsPastPrev();
+}
+async function tsPastFetch(){
+  const d=(el('tpx-dt')||{}).value;if(!d)return;const b=el('tpx-get');if(b){b.disabled=true;b.textContent='Getting prices…';}
+  const ok=await tspFetchRange(_tsAdd(d,-4),_tsAdd(d,5));
+  if(!ok&&typeof toast==='function')toast('TSP.gov didn’t answer from the browser — type the prices instead','var(--orange)');
+  tsPastPx();
+}
+function tsPastBack(){const on=el('tpx-back').checked,w=el('tpx-bw');if(w)w.style.display=on?'grid':'none';const g=el('tpx-go');if(g)g.textContent=on?'Add round trip':'Add transfer';if(on){tsPastPx2();const d=el('tpx-bdt');if(d&&!d.value)setTimeout(function(){d.focus();},20);}else tsPastPrev();}
+function tsPastPx2(quiet){
+  if(!_tpx)return;const d=(el('tpx-bdt')||{}).value,f=(el('tpx-f')||{}).value,t=(el('tpx-t')||{}).value,box=el('tpx-bpxs');
+  if(!d){if(box)box.textContent='';if(!quiet)tsPastPrev();return;}
+  const P=tspPricesFor(d),a=el('tpx-bpt'),b=el('tpx-bpf'),ok=P&&(P.how==='exact'||P.how==='next')&&_tsPx(P.prices,f)>0&&_tsPx(P.prices,t)>0;
+  if(ok){if(!a.value||a.dataset.auto==='1'){a.value=_tsPx(P.prices,t);a.dataset.auto='1';}if(!b.value||b.dataset.auto==='1'){b.value=_tsPx(P.prices,f);b.dataset.auto='1';}_tpx.bpxDate=P.date;
+    box.innerHTML='Closing prices from '+_trLbl(P.date)+(P.how==='next'?' (next trading day)':'')+'.';}
+  else{_tpx.bpxDate=d;box.innerHTML='No saved closes for '+_trLbl(d)+'. <button type="button" class="pv-lnk" id="tpx-get2" onclick="tsPastFetch2()">Get them from TSP.gov</button> or type them in.';}
+  if(!quiet)tsPastPrev();
+}
+async function tsPastFetch2(){const d=(el('tpx-bdt')||{}).value;if(!d)return;const b=el('tpx-get2');if(b){b.disabled=true;b.textContent='Getting prices…';}
+  const ok=await tspFetchRange(_tsAdd(d,-4),_tsAdd(d,5));if(!ok&&typeof toast==='function')toast('TSP.gov didn’t answer from the browser — type the prices instead','var(--orange)');tsPastPx2();}
+function _tsPastRead(){
+  const g=function(i){return (el(i)||{}).value;},n=function(i){return parseFloat(g(i));};
+  const d=g('tpx-dt'),f=g('tpx-f'),t=g('tpx-t'),sh=n('tpx-sh'),hbRaw=g('tpx-hb'),pf=n('tpx-pf'),pt=n('tpx-pt');
+  const hb=hbRaw===''||hbRaw==null?sh:parseFloat(hbRaw);
+  let err='';
+  if(!d)err='Pick the transfer date.';else if(d>_trToday())err='That date is in the future. Use Rebalance for a new transfer.';
+  else if(f===t)err='Pick two different funds.';else if(!(sh>0))err='Enter the shares you sold.';
+  else if(!(hb>=sh-1e-6))err='Shares you had can’t be less than shares sold.';
+  else if(!(pf>0)||!(pt>0))err='Enter both closing prices.';
+  const v=(sh||0)*(pf||0),bought=pt>0?v/pt:0;
+  const back=!!(el('tpx-back')&&el('tpx-back').checked),bd=g('tpx-bdt'),bpt=n('tpx-bpt'),bpf=n('tpx-bpf');
+  if(!err&&back){if(!bd)err='Pick the date you moved back.';else if(bd<=d)err='The move back has to be after '+_trLbl(d)+'.';else if(bd>_trToday())err='The move-back date is in the future. Use the what-if on the scorecard for that.';else if(!(bpt>0)||!(bpf>0))err='Enter both prices for the move back.';}
+  const backSh=back&&bpf>0?bought*bpt/bpf:0,rtSh=backSh-(sh||0),rtUsd=rtSh*(bpf||0);
+  const dup=!err&&(tspIftLog||[]).some(function(x){const xd=x.pxDate||x.date;return (xd===(_tpx&&_tpx.pxDate||d)||x.date===d)&&((parseFloat((x.before||{})[f])||0)-(parseFloat((x.after||{})[f])||0))>0;});
+  return {d:d,f:f,t:t,sh:sh,hb:hb,pf:pf,pt:pt,v:v,bought:bought,err:err,dup:dup,back:back,bd:bd,bpt:bpt,bpf:bpf,backSh:backSh,rtSh:rtSh,rtUsd:rtUsd};
+}
+function tsPastPrev(){
+  const r=_tsPastRead(),box=el('tpx-prev'),go=el('tpx-go');if(!box)return;if(go)go.disabled=!!r.err;
+  ['tpx-pf','tpx-pt','tpx-bpt','tpx-bpf'].forEach(function(i){const e=el(i);if(e&&document.activeElement===e)e.dataset.auto='0';});
+  if(r.err){box.innerHTML='<span style="color:var(--muted)">'+r.err+'</span>';return;}
+  const row=function(l,v){return '<div style="display:flex;justify-content:space-between;gap:1rem"><span style="color:var(--muted)">'+l+'</span><span style="font-family:\'DM Mono\',monospace;text-align:right;font-weight:600">'+v+'</span></div>';};
+  box.innerHTML=row('Sold',_tsSh(r.sh)+' '+_tsShort(r.f)+' × '+_tsPxf(r.pf))+row('Amount moved',_pvM(r.v,2))+row('Bought',_tsSh(r.bought)+' '+_tsShort(r.t)+' × '+_tsPxf(r.pt))+
+    (r.hb>r.sh+1e-6?row('Left in '+_tsShort(r.f),_tsSh(r.hb-r.sh)):'')+
+    (r.back?row('Moved back',_tsSh(r.bought)+' '+_tsShort(r.t)+' × '+_tsPxf(r.bpt)+' → '+_tsSh(r.backSh)+' '+_tsShort(r.f))+
+      '<div style="display:flex;justify-content:space-between;gap:1rem;margin-top:.35rem;padding-top:.4rem;border-top:1px solid var(--border)"><span><span class="ts-tag '+(Math.abs(r.rtSh)<0.005?'even':r.rtSh>0?'good':'bad')+'" style="margin-right:.4rem">'+(Math.abs(r.rtSh)<0.005?'Even':r.rtSh>0?'Won':'Lost')+'</span>Round trip vs. staying in '+_esc(_tspName(r.f))+'</span><span style="font-family:\'DM Mono\',monospace;font-weight:600;color:'+_pvC(r.rtSh)+'">'+_tsSS(r.rtSh)+' sh · '+_pvS(r.rtUsd,0)+' at '+_pvM(r.bpf,2)+'</span></div>':'')+
+    (r.dup?'<div style="color:var(--orange);margin-top:.35rem">A transfer out of '+_esc(_tspName(r.f))+' on this date is already in your log. Adding it again would count it twice.</div>':'');
+}
+function tsPastSave(){
+  const r=_tsPastRead();if(r.err){toast(r.err,'var(--red)');return;}
+  const before={},after={},prices={},from={},to={};
+  before[r.f]=r.hb;after[r.f]=_r2x(r.hb-r.sh);before[r.t]=0;after[r.t]=_r2x(r.bought);
+  prices[r.f]=r.pf;prices[r.t]=r.pt;from[r.f]=100;to[r.t]=100;
+  const e={id:Date.now(),date:r.d,pxDate:(_tpx&&_tpx.pxDate)||r.d,total:_r2(r.v),before:before,after:after,prices:prices,from:from,to:to,past:true};
+  tspIftLog.push(e);
+  if(r.back){const b2={},a2={},p2={},f2={},t2={};b2[r.t]=_r2x(r.bought);a2[r.t]=0;b2[r.f]=_r2x(r.hb-r.sh);a2[r.f]=_r2x(r.hb-r.sh+r.backSh);p2[r.t]=r.bpt;p2[r.f]=r.bpf;f2[r.t]=100;t2[r.f]=100;
+    tspIftLog.push({id:e.id+1,date:r.bd,pxDate:(_tpx&&_tpx.bpxDate)||r.bd,total:_r2(r.bought*r.bpt),before:b2,after:a2,prices:p2,from:f2,to:t2,past:true});}
+  tspIftLog.sort(function(a,b){const x=a.pxDate||a.date,y=b.pxDate||b.date;return x<y?1:x>y?-1:b.id-a.id;});
+  tspIftLog=tspIftLog.slice(0,60);
+  tsPastClose();renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+  if(r.back){toast('Round trip added · '+_tsShort(r.f)+' → '+_tsShort(r.t)+' → '+_tsShort(r.f)+' · '+_tsSS(r.rtSh)+' '+_tsShort(r.f)+' shares');tsOpen('trip',String(e.id));return;}
+  toast('Past transfer added · '+_tsShort(r.f)+' → '+_tsShort(r.t)+' on '+_trLbl(r.d));
+  const ov=el('ts-overlay');if(ov&&ov.classList.contains('open'))tsOpen('moves');
+}
+function tsPastDel(id){
+  const t=(tspIftLog||[]).find(function(x){return String(x.id)===String(id);});if(!t||!t.past)return;
+  confirmDelete('Remove the '+_trLbl(t.date)+' past transfer from your log? Fund shares don’t change.',function(){
+    tspIftLog=tspIftLog.filter(function(x){return x!==t;});if(tspMoveFlags)delete tspMoveFlags[t.id];if(tspWhatIf)delete tspWhatIf[t.id];
+    renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();toast('Past transfer removed');
+    const ov=el('ts-overlay');if(ov&&ov.classList.contains('open'))tsOpen('moves');
+  },'Remove past transfer?','Yes, remove');
+}
+
+// ===== TSP trade scorecard — every interfund transfer graded against staying in the fund you left =====
+// Built entirely from tspIftLog (shares before/after + closing prices of each transfer), so no extra
+// data is recorded. A "move" follows the money that left a fund: it stays OPEN while that money sits
+// elsewhere and CLOSES when a later transfer moves it again (a round trip when it lands back where it
+// started). Contributions made in between are never counted: only the moved shares are followed.
+let tspMoveFlags={};let tspWhatIf={};   // {moveId:{c,g}} — what-if move-back price per open move
+   // {moveId:'kept'} — a move the user marked as a permanent change (stops showing as open)
+let _ts={view:'moves',id:null,from:null};
+function _tsPx(P,k){return parseFloat((P||{})[k])||0;}
+function _tsShort(k){return _tspName(k).replace(' Fund','');}
+function _tsNowPx(){const o={};TSP_FUNDS.forEach(function(f){const p=parseFloat((tspFunds[f[0]]||{}).px)||0;if(p>0)o[f[0]]=p;});return o;}
+function _tsNowDate(){let m=Object.keys(tspPxHist).sort().pop()||'';TSP_FUNDS.forEach(function(f){const x=(tspFunds[f[0]]||{}).pxd;if(x&&x>m&&x<=_trToday())m=x;});return m||_trToday();}
+function _tsVal(sh,P){let v=0;Object.keys(sh||{}).forEach(function(k){v+=(sh[k]||0)*_tsPx(P,k);});return v;}
+function _tsDays(a,b){return Math.round((Date.parse(b+'T12:00:00')-Date.parse(a+'T12:00:00'))/864e5);}
+function _tsAdd(iso,n){const d=new Date(iso+'T12:00:00');d.setDate(d.getDate()+n);return _thISO(d.getFullYear(),d.getMonth()+1,d.getDate());}
+function _tsMD(iso){const d=new Date(iso+'T12:00:00');return isNaN(d)?iso:d.toLocaleDateString('en-US',{month:'short',day:'numeric'});}
+function _tsSh(n){return (Math.abs(n)<0.005?0:n).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function _tsSS(n){return (n>=0?'+':_PVM)+_tsSh(Math.abs(n));}
+function _tsPxf(n){return '$'+(+n).toFixed(4);}
+// trading days the money missed: closes after the sell date through the buy-back date
+function _tsTDays(a,b){
+  const ks=Object.keys(tspPxHist).filter(function(d){return d>a&&d<=b;}),cal=_tsDays(a,b);
+  let wk=0;for(let i=1;i<=cal;i++){const d=new Date(a+'T12:00:00');d.setDate(d.getDate()+i);const w=d.getDay();if(w&&w<6)wk++;}
+  return (tspPxHist[a]&&tspPxHist[b]&&ks.length>=wk*0.6)?{n:ks.length,est:false}:{n:wk,est:true};
+}
+// label for a set of fund shares: "C Fund" or "C 60% · S 40%"
+function _tsSet(sh,P){
+  const ks=Object.keys(sh||{}).filter(function(k){return sh[k]>1e-6;});
+  if(ks.length===1)return _tspName(ks[0]);
+  const v=function(k){return sh[k]*_tsPx(P,k);},tot=ks.reduce(function(s,k){return s+v(k);},0);
+  return ks.sort(function(a,b){return v(b)-v(a);}).map(function(k){return _tsShort(k)+' '+Math.round(tot>0?v(k)/tot*100:0)+'%';}).join(' · ');
+}
+function _tsMoves(){
+  const L=(tspIftLog||[]).slice().sort(function(a,b){const x=a.pxDate||a.date,y=b.pxDate||b.date;return x<y?-1:x>y?1:(a.id-b.id);});
+  const open=[],done=[];
+  L.forEach(function(t){
+    const P=t.prices||{},B=t.before||{},A=t.after||{},ks={};Object.keys(B).concat(Object.keys(A)).forEach(function(k){ks[k]=1;});
+    const sold={},bought={};let soldV=0,boughtV=0;
+    Object.keys(ks).forEach(function(k){const d=(parseFloat(A[k])||0)-(parseFloat(B[k])||0),p=_tsPx(P,k);if(!(p>0))return;
+      if(d<-1e-6){sold[k]=-d;soldV+=-d*p;}else if(d>1e-6){bought[k]=d;boughtV+=d*p;}});
+    if(soldV<0.01||boughtV<0.01)return;
+    const frac={};Object.keys(sold).forEach(function(k){const b=parseFloat(B[k])||0;frac[k]=b>0?Math.min(1,sold[k]/b):0;});
+    const mix=function(V){const o={};Object.keys(bought).forEach(function(k){o[k]=V*(bought[k]*_tsPx(P,k)/boughtV)/_tsPx(P,k);});return o;};
+    const date=t.pxDate||t.date;let used=0;
+    // money from earlier moves that this transfer moves again (each fund sells the same fraction of every share in it)
+    for(let i=open.length-1;i>=0;i--){const m=open[i];let V=0,full=0;const rem={},out={};
+      Object.keys(m.basket).forEach(function(k){const sh=m.basket[k],f=frac[k]||0,p=_tsPx(P,k)||_tsPx(m.legs[m.legs.length-1].P,k);V+=sh*f*p;full+=sh*p;if(sh*f>1e-9)out[k]=sh*f;if(sh*(1-f)>1e-6)rem[k]=sh*(1-f);});
+      if(V<0.01)continue;
+      used+=V;const inn=mix(V),nb=Object.assign({},rem);Object.keys(inn).forEach(function(k){nb[k]=(nb[k]||0)+inn[k];});
+      m.legs.push({id:t.id,date:date,sold:out,bought:inn,P:P,v:V,after:Object.assign({},nb)});m.basket=nb;
+      if(full>0&&V/full>=0.99){m.endDate=date;open.splice(i,1);done.push(m);}
+    }
+    // new money leaving a fund (ignore leftovers under 5% of the transfer — contributions riding along)
+    const resid=soldV-used;
+    if(resid>Math.max(1,0.05*soldV)){const sc=resid/soldV,stay={};Object.keys(sold).forEach(function(k){stay[k]=sold[k]*sc;});const bk=mix(resid);
+      open.push({id:t.id,startDate:date,stay:stay,basket:bk,v0:resid,P0:P,legs:[{id:t.id,date:date,sold:stay,bought:bk,P:P,v:resid,after:Object.assign({},bk)}]});}
+  });
+  const flags=tspMoveFlags||{};
+  for(let i=open.length-1;i>=0;i--){if(flags[open[i].id]==='kept'){open[i].kept=true;done.push(open.splice(i,1)[0]);}}
+  const Pn=_tsNowPx();
+  const fin=function(m,isOpen){
+    const lastP=m.legs[m.legs.length-1].P,pn=function(k){return Pn[k]||_tsPx(lastP,k)||_tsPx(m.P0,k);};
+    const sk=Object.keys(m.stay),one=sk.length===1?sk[0]:null,bk=Object.keys(m.basket).filter(function(k){return m.basket[k]>1e-6;});
+    m.pn=pn;m.one=one;m.stayNow=0;m.haveNow=0;
+    sk.forEach(function(k){m.stayNow+=m.stay[k]*pn(k);});bk.forEach(function(k){m.haveNow+=m.basket[k]*pn(k);});
+    m.diff=m.haveNow-m.stayNow;m.back=!!(one&&bk.length===1&&bk[0]===one);
+    m.dSh=one&&(m.back||isOpen)&&pn(one)>0?(m.back?m.basket[one]:m.haveNow/pn(one))-m.stay[one]:null;
+    m.bePx=one&&isOpen&&m.stay[one]>0?m.haveNow/m.stay[one]:null;
+    m.status=isOpen?'open':(m.kept?'kept':'closed');
+    const ch=[_tsSet(m.stay,m.P0)];m.legs.forEach(function(l){const s=_tsSet(l.after,l.P);if(s!==ch[ch.length-1])ch.push(s);});
+    if(isOpen)ch.push('?');m.chain=ch;
+    m.grade=Math.abs(m.diff)<0.5?'even':m.diff>0?'good':'bad';
+  };
+  open.forEach(function(m){fin(m,true);});done.forEach(function(m){fin(m,false);});
+  done.sort(function(a,b){const x=a.endDate||a.startDate,y=b.endDate||b.startDate;return x<y?1:x>y?-1:b.id-a.id;});
+  open.sort(function(a,b){return a.startDate<b.startDate?1:-1;});
+  return {open:open,done:done};
+}
+// forward value of a dollar difference, on the same assumptions as the FIRE plan
+function _tsFwd(d){
+  const r=(val('f-ret')||7)/100,i=typeof inflRate==='function'?inflRate():0.025,tx=typeof taxRate==='function'?taxRate():0.12,swr=(val('f-swr')||4)/100;
+  const tr=val('tsp-trad-bal'),ro=val('tsp-roth-bal'),trad=tr+ro>0?tr/(tr+ro):1;
+  const n=new Date(),fy=window._adjFireYear,now=n.getFullYear()+n.getMonth()/12,yrs=fy?Math.max(0,fy-now):20;
+  const real=d*Math.pow((1+r)/(1+i),yrs),at=real*(1-tx*trad);
+  return {yrs:yrs,yr:fy||n.getFullYear()+20,fi:!!fy,nom:d*Math.pow(1+r,yrs),real:real,at:at,inc:at*swr,r:r,i:i,tx:tx,trad:trad,swr:swr};
+}
+function _tsUsed(){const ym=_trToday().slice(0,7);return (tspIftLog||[]).filter(function(t){return String(t.date||'').slice(0,7)===ym;}).length;}
+function _tsGradeTxt(g){return g==='good'?'Beat staying put':g==='bad'?'Trailed staying put':'About even';}
+
+// ── summary line in the TSP card ──
+function renderTspScore(){
+  const h=el('tsp-score');if(!h)return;
+  if(!(tspIftLog||[]).length){h.innerHTML='';return;}
+  let M;try{M=_tsMoves();}catch(e){console.error(e);h.innerHTML='';return;}
+  const o=M.open[0],c=M.done[0];
+  if(o){const x=o.one;
+    h.innerHTML='<div class="ts-sum"><span><span class="ts-tag open">Open</span><b>In '+_esc(o.chain.slice(-2,-1)[0])+' since '+_tsMD(o.startDate)+'</b>'+(M.open.length>1?' · '+M.open.length+' open moves':'')+
+      '<em>'+(x&&o.dSh!=null?'At the latest close: '+_tsSS(o.dSh)+' '+_tsShort(x)+' shares ('+_pvS(o.diff,0)+') · break-even '+_tsShort(x)+' '+_pvM(o.bePx,2):'vs. staying in '+_esc(o.chain[0])+': '+_pvS(o.diff,0)+' today')+'</em></span>'+
+      '<button type="button" class="btn sm" onclick="tsOpen(\'moves\')">Your moves</button></div>';
+  }else if(c){
+    h.innerHTML='<div class="ts-sum"><span><span class="ts-tag '+(c.kept?'kept':c.grade)+'">'+(c.kept?'Kept':c.grade==='good'?'Won':c.grade==='bad'?'Lost':'Even')+'</span><b>'+(c.back?'Last round trip':'Last move')+' · '+_esc(c.chain.map(function(s){return s.replace(' Fund','');}).join(' → '))+'</b>'+
+      '<em>'+(c.dSh!=null?_tsSS(c.dSh)+' '+_tsShort(c.one)+' shares · ':'')+_pvS(c.diff,0)+' vs. staying in '+_esc(c.chain[0])+'</em></span>'+
+      '<button type="button" class="btn sm" onclick="tsOpen(\'trip\',\''+c.id+'\')">Scorecard</button></div>';
+  }else h.innerHTML='';
+}
+
+// ── dialog ──
+function tsOpen(view,id){
+  let ov=el('ts-overlay');
+  if(!ov){ov=document.createElement('div');ov.id='ts-overlay';ov.className='modal-overlay';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','ts-title');document.body.appendChild(ov);
+    ov.addEventListener('click',function(e){if(e.target===ov)tsClose();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open'))tsClose();});}
+  const M=_tsMoves();
+  // a move still out → Your moves; everything back → the latest round trip
+  if(!view)view=M.open.length||!M.done.length?'moves':'trip';
+  if(view==='trip'&&!id&&M.done[0])id=String(M.done[0].id);
+  if(view==='trip'&&!M.done.some(function(m){return String(m.id)===String(id);}))view='moves';
+  _ts.view=view;_ts.id=id||null;
+  tsRender(M);ov.classList.add('open');
+}
+function tsClose(){const ov=el('ts-overlay');if(ov)ov.classList.remove('open');}
+function tsRender(M){
+  const ov=el('ts-overlay');if(!ov)return;M=M||_tsMoves();
+  const m=_ts.view==='trip'?M.done.find(function(x){return String(x.id)===String(_ts.id);}):null;
+  ov.innerHTML='<div class="modal ts-modal">'+(m?_tsTripHtml(m,M):_tsMovesHtml(M))+'</div>';
+  if(m)_tsDrawChart(m);
+}
+function _tsHead(eye,title,sub){return '<div class="ts-head"><div><h2 id="ts-title">'+title+'</h2>'+(sub?'<div class="ts-sub">'+sub+'</div>':'')+'</div><button class="modal-close" type="button" onclick="tsClose()" aria-label="Close">&times;</button></div>';}
+function _tsAssume(F){return 'Forward value uses your FIRE plan: '+(F.r*100).toFixed(1)+'% return, '+(F.i*100).toFixed(1)+'% inflation, '+(F.tx*100).toFixed(0)+'% tax on the traditional '+Math.round(F.trad*100)+'% of your TSP, '+(F.fi?F.yrs.toFixed(1)+' years to your FI date ('+F.yr+')':'20 years (no FI date in your plan yet)')+'. Transfers inside the TSP aren’t taxed.';}
+function _tsTile(k,v,s,col){return '<div class="pv-card ts-tile"><div class="ts-k">'+k+'</div><div class="ts-v"'+(col?' style="color:'+col+'"':'')+'>'+v+'</div><div class="ts-s">'+s+'</div></div>';}
+function _tsFlist(sh,P){return Object.keys(sh).filter(function(k){return sh[k]>1e-6;}).map(function(k){return _tsSh(sh[k])+' '+_tsShort(k)+' @ '+_tsPxf(_tsPx(P,k));}).join('<br>');}
+
+function _tsTripHtml(m,M){
+  const F=_tsFwd(m.diff),x=m.one,end=m.kept?_tsNowDate():m.endDate,cal=_tsDays(m.startDate,end),td=_tsTDays(m.startDate,end);
+  const mid=m.chain.length>2?m.chain.slice(1,-1).join(' → '):m.chain[1];
+  const title=(m.back?'Round trip: ':m.kept?'Kept move: ':'Move: ')+_esc(m.chain.join(' → '));
+  const sub=_trLbl(m.startDate).replace(/, \d{4}$/,'')+' – '+(m.kept?'today (kept as a permanent change)':_trLbl(end))+' · '+cal+' day'+(cal===1?'':'s')+' out of '+_esc(m.chain[0])+' ('+(td.est?'~':'')+td.n+' trading day'+(td.n===1?'':'s')+') · graded against staying in '+_esc(m.chain[0]);
+  const ic=m.grade==='good'?'<path d="M20 6 9 17l-5-5"/>':m.grade==='bad'?'<path d="M18 6 6 18M6 6l12 12"/>':'<path d="M5 12h14"/>';
+  const col=_pvC(m.diff);
+  let h=_tsHead('TSP · Transfer scorecard',title,sub)+'<div class="v2x ts-body">';
+  h+='<div class="ts-top"><span class="ts-pill '+m.grade+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic+'</svg>'+_tsGradeTxt(m.grade)+'</span>'+
+    '<span class="ts-act">'+(M.open.length||M.done.length>1?'<button type="button" class="pv-lnk" onclick="tsOpen(\'moves\')">All your moves →</button>':'')+(m.kept?'<button type="button" class="pv-lnk" onclick="tsKeep(\''+m.id+'\',false)">Track as an open move again</button>':'')+'</span></div>';
+  // tiles
+  h+='<div class="ts-tiles">';
+  if(m.dSh!=null)h+=_tsTile('Shares',_tsSS(m.dSh),_tsShort(x)+' shares '+(m.dSh>=0?'more':'fewer')+' than if you’d stayed · <span class="pv-num">'+_pvP(m.dSh/m.stay[x]*100,1)+'</span>',col);
+  else h+=_tsTile('Moved money now',_pvM(m.haveNow,0),'vs. <span class="pv-num">'+_pvM(m.stayNow,0)+'</span> if you’d stayed',col);
+  h+=_tsTile('Value today',_pvS(m.diff,0),x?_tsShort(x)+'’s latest close: <span class="pv-num">'+_pvM(m.pn(x),2)+'</span> ('+_tsMD(_tsNowDate())+')':'At the latest closing prices ('+_tsMD(_tsNowDate())+')',col);
+  h+=_tsTile((F.fi?'At your FI date · ':'In 20 years · ')+F.yr,_pvS(F.real,0),'Today’s dollars, before tax · <span class="pv-num">'+_pvS(F.nom,0)+'</span> nominal',col);
+  h+=_tsTile('Retirement income',_pvS(F.inc,0)+'<small>/yr</small>','After tax, at your '+(F.swr*100).toFixed(1).replace(/\.0$/,'')+'% withdrawal rate',col);
+  h+='</div>';
+  // chart + comparison
+  const P1=m.kept?null:m.legs[m.legs.length-1].P,stayEnd=m.kept?m.stayNow:_tsVal(m.stay,P1),movedEnd=m.kept?m.haveNow:m.legs[m.legs.length-1].v;
+  const S=_tsStaySeries(m,m.startDate,end),wst=S.length>1?S.reduce(function(a,p){return Math.min(a,p.v/S[0].v-1);},0):null;
+  let best=null;for(let i=1;i<S.length;i++){if(S[i].d<=m.startDate||_tsDays(S[i-1].d,S[i].d)>4)continue;const g=S[i].v/S[i-1].v-1;if(!best||g>best.g)best={g:g,d:S[i].d};}
+  const wd=wst!=null&&wst<0?S.find(function(p){return Math.abs(p.v/S[0].v-1-wst)<1e-12;}):null;
+  const mx=Math.max(m.stayNow,m.haveNow)||1;
+  h+='<div class="ts-cols"><div class="pv-card pv-chart" id="ts-chart"></div>'+
+    '<div class="pv-card ts-cmp"><b class="pv-h">Moved vs. stayed, at the latest prices</b>'+
+    '<div class="ts-bar"><div><span>If you’d stayed in '+_esc(m.chain[0])+'</span><span class="pv-num">'+_pvM(m.stayNow,0)+'</span></div><i style="width:'+(m.stayNow/mx*100).toFixed(1)+'%;background:color-mix(in srgb,var(--muted) 45%,var(--surface2))"></i><em>'+(x?_tsSh(m.stay[x])+' sh × '+_pvM(m.pn(x),2):_tsFlist(m.stay,m.P0).replace(/<br>/g,' · '))+'</em></div>'+
+    '<div class="ts-bar"><div><span>What you have</span><span class="pv-num" style="color:'+col+';font-weight:500">'+_pvM(m.haveNow,0)+'</span></div><i style="width:'+(m.haveNow/mx*100).toFixed(1)+'%;background:'+(m.grade==='bad'?'var(--red)':'var(--green)')+'"></i><em>'+Object.keys(m.basket).filter(function(k){return m.basket[k]>1e-6;}).map(function(k){return _tsSh(m.basket[k])+' '+_tsShort(k)+' × '+_pvM(m.pn(k),2);}).join(' · ')+'</em></div>'+
+    '<div class="ts-grid4">'+
+      '<div><span>'+_esc(x?_tsShort(x)+' while you were out':'Staying put did')+'</span><b style="color:'+_pvC(stayEnd/m.v0-1)+'">'+_pvP((stayEnd/m.v0-1)*100,2)+'</b></div>'+
+      '<div><span>'+_esc((mid||'').replace(' Fund','')+' while you were in')+'</span><b style="color:'+_pvC(movedEnd/m.v0-1)+'">'+_pvP((movedEnd/m.v0-1)*100,2)+'</b></div>'+
+      '<div><span>'+_esc(x?_tsShort(x)+'’s worst point':'Worst point if you’d stayed')+'</span><b>'+(wd?_pvP(wst*100,1)+' · '+_tsMD(wd.d):wst===0?'Never below your sell':'—')+'</b></div>'+
+      '<div><span>'+_esc(x?_tsShort(x)+'’s best day missed':'Best day missed')+'</span><b>'+(best?_pvP(best.g*100,1)+' · '+_tsMD(best.d):'—')+'</b></div>'+
+    '</div></div></div>';
+  // the transfers
+  h+='<div class="pv-card"><b class="pv-h">The transfer'+(m.legs.length>1?'s':'')+'</b><div class="ts-legs"><span class="h">Date</span><span class="h">Sold</span><span class="ar"></span><span class="h">Bought</span>'+
+    m.legs.map(function(l,i){return '<b>'+_trLbl(l.date).replace(/, \d{4}$/,'')+'</b><span class="pv-num">'+_tsFlist(l.sold,l.P)+' = '+_pvM(l.v,2)+'</span>'+
+      '<svg class="ar" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-dim)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'+
+      '<span class="pv-num"'+(i===m.legs.length-1&&m.back?' style="color:var(--green);font-weight:500"':'')+'>'+_tsFlist(l.bought,l.P)+'</span>';}).join('')+'</div></div>';
+  h+='<div class="ts-foot"><span>'+_tsAssume(F)+'</span></div></div>';
+  return h;
+}
+// value of the shares you sold, day by day (or the fund's price when you left a single fund)
+function _tsStaySeries(m,from,to){
+  const ks=Object.keys(tspPxHist).filter(function(d){return d>=from&&d<=to;}).sort(),out=[];
+  ks.forEach(function(d){const v=_tsVal(m.stay,tspPxHist[d]);if(v>0&&Object.keys(m.stay).every(function(k){return _tsPx(tspPxHist[d],k)>0;}))out.push({d:d,v:v});});
+  if(!out.length||out[0].d!==from){const v0=_tsVal(m.stay,m.P0);if(v0>0)out.unshift({d:from,v:v0});}
+  return out;
+}
+function _tsDrawChart(m){
+  const c=el('ts-chart');if(!c)return;
+  const x=m.one,s0=m.startDate,e0=m.kept?null:m.endDate,today=_tsNowDate(),span=Math.max(10,_tsDays(s0,today)),from=_tsAdd(s0,-Math.max(10,Math.round(span*0.18)));
+  const ks=Object.keys(tspPxHist).filter(function(d){return d>=from&&d<=today;}).sort();
+  // single fund: its price; several funds: the value of what you sold vs. the money you moved
+  const stayV=function(d){const P=tspPxHist[d];return x?_tsPx(P,x):_tsVal(m.stay,P);};
+  const bAt=function(d){let b=m.stay;if(d>=s0)m.legs.forEach(function(l){if(l.date<=d)b=l.after;});return b;};
+  const pts=[];ks.forEach(function(d){const v=stayV(d);if(v>0)pts.push({d:d,v:v,w:x?null:_tsVal(bAt(d),tspPxHist[d])});});
+  const head='<div class="pv-ch"><b class="pv-h">'+(x?_esc(_tspName(x))+' price while you were out':'Moved money vs. staying put')+'</b>'+(pts.length>=3?'<span class="ts-leg"><span><i class="box"></i>Out of '+_esc(x?_tsShort(x):m.chain[0])+'</span>'+(x?'<span><i class="dash"></i>Your sell price</span>':'<span><i class="dash"></i>Moved money</span>')+'</span>':'')+'</div>';
+  if(pts.length<3){
+    c.innerHTML=head+'<div class="pv-empty th-empty" style="height:230px;flex-direction:column;gap:10px;display:flex;align-items:center;justify-content:center"><span class="pv-mut">Daily closing prices for these dates aren’t saved yet.</span><button type="button" class="btn" id="ts-load" onclick="tsLoadPx(\''+from+'\')">Get prices from TSP.gov</button></div>';return;}
+  const t=function(d){return Date.parse(d+'T12:00:00');},T0=t(pts[0].d),T1=t(pts[pts.length-1].d),X=function(d){return (t(d)-T0)/((T1-T0)||1)*1000;};
+  const all=pts.map(function(p){return p.v;}).concat(x?[_tsPx(m.P0,x)]:pts.map(function(p){return p.w;}));
+  let lo=Math.min.apply(null,all),hi=Math.max.apply(null,all);const pad=(hi-lo)*0.12||hi*0.02;lo-=pad;hi+=pad;
+  const H=230,Y=function(v){return H-(v-lo)/(hi-lo)*H;};
+  const fmt=function(v){return x?'$'+v.toFixed(v>=100?0:2):_pvK(v);};
+  // gridlines: 4 even steps
+  let g='';for(let i=1;i<=3;i++){const v=lo+(hi-lo)*i/4,tp=(Y(v)/H*100).toFixed(2);g+='<div class="pv-gl" style="top:'+tp+'%"></div><div class="pv-yl" style="top:'+tp+'%">'+fmt(v)+'</div>';}
+  const line=function(k){return 'M'+pts.map(function(p){return X(p.d).toFixed(1)+','+Y(p[k]).toFixed(1);}).join('L');};
+  const xs=X(s0)/10,xe=(e0?X(e0):1000)/10;
+  let svg='<path d="'+line('v')+'" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>';
+  if(x){const sp=Y(_tsPx(m.P0,x));svg+='<line x1="'+X(s0).toFixed(1)+'" y1="'+sp.toFixed(1)+'" x2="1000" y2="'+sp.toFixed(1)+'" stroke="var(--muted)" stroke-width="1.5" stroke-dasharray="5 5" vector-effect="non-scaling-stroke"/>';}
+  else svg+='<path d="M'+pts.filter(function(p){return p.d>=s0;}).map(function(p){return X(p.d).toFixed(1)+','+Y(p.w).toFixed(1);}).join('L')+'" fill="none" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5" vector-effect="non-scaling-stroke"/>';
+  let marks='<div class="ts-shade" style="left:'+xs.toFixed(2)+'%;width:'+Math.max(0.5,xe-xs).toFixed(2)+'%"></div>';
+  const vS=x?_tsPx(m.P0,x):_tsVal(m.stay,m.P0);
+  marks+='<i class="ts-dot" style="left:'+xs.toFixed(2)+'%;top:'+(Y(vS)/H*100).toFixed(2)+'%;background:var(--red)"></i><div class="ts-flag" style="left:'+Math.max(8,Math.min(88,xs)).toFixed(2)+'%;top:'+Math.max(0,Y(vS)/H*100-16).toFixed(2)+'%"><b>Sold '+_esc(x?_tsShort(x):'')+'</b> · <span class="pv-num">'+(x?_tsPxf(vS).replace(/(\.\d\d)\d\d$/,'$1'):_pvK(vS))+'</span></div>';
+  if(e0&&m.back){const vE=_tsPx(m.legs[m.legs.length-1].P,x);
+    marks+='<i class="ts-dot" style="left:'+xe.toFixed(2)+'%;top:'+(Y(vE)/H*100).toFixed(2)+'%;background:var(--green)"></i><div class="ts-flag" style="left:'+Math.max(8,Math.min(88,xe)).toFixed(2)+'%;top:'+Math.min(84,Y(vE)/H*100+9).toFixed(2)+'%"><b>Bought '+_esc(_tsShort(x))+'</b> · <span class="pv-num">'+_tsPxf(vE).replace(/(\.\d\d)\d\d$/,'$1')+'</span></div>';}
+  marks+='<i class="ts-dot" style="left:100%;top:'+(Y(pts[pts.length-1].v)/H*100).toFixed(2)+'%;background:var(--accent);width:10px;height:10px;margin:-5px 0 0 -5px"></i>';
+  // x labels: first day, sold, bought, today — skipped when they would collide
+  const xl=[];[[s0,_tsMD(s0)],[e0,e0?_tsMD(e0):''],[pts[pts.length-1].d,'Today'],[pts[0].d,_tsMD(pts[0].d)]].forEach(function(a){if(!a[0])return;const f=X(a[0])/10;if(xl.every(function(b){return Math.abs(b.f-f)>9;}))xl.push({f:f,t:a[1]});});
+  const xt=xl.map(function(a){return '<span style="left:'+a.f.toFixed(2)+'%;transform:translateX('+(a.f<5?'0':a.f>95?'-100%':'-50%')+')">'+a.t+'</span>';}).join('');
+  window._tsRows={pts:pts,X:X,x:x,s0:s0,e0:e0,m:m};
+  c.innerHTML=head+'<div class="pv-plot ts-plot" id="ts-plot" onmousemove="_tsHover(event)" onmouseleave="_tsOff()" role="img" aria-label="'+_esc((x?_tspName(x)+' price':'Value of what you sold')+' from '+_tsMD(pts[0].d)+' to today, with the time you were out shaded')+'">'+g+marks+
+    '<svg viewBox="0 0 1000 '+H+'" preserveAspectRatio="none" aria-hidden="true">'+svg+'</svg><div class="pv-rule" id="ts-rule"></div><div class="pv-tip" id="ts-tip"></div></div><div class="pv-xl">'+xt+'</div>';
+}
+function _tsHover(e){const S=window._tsRows,box=el('ts-plot');if(!S||!box)return;const r=box.getBoundingClientRect(),f=(e.clientX-r.left)/r.width*1000;
+  let k=0;S.pts.forEach(function(p,i){if(Math.abs(S.X(p.d)-f)<Math.abs(S.X(S.pts[k].d)-f))k=i;});
+  const p=S.pts[k],q=k>0?S.pts[k-1]:null,xp=S.X(p.d)/10,rule=el('ts-rule'),tip=el('ts-tip'),out=p.d>=S.s0&&(!S.e0||p.d<S.e0);
+  rule.style.left=xp+'%';rule.style.display='block';
+  tip.innerHTML='<b>'+_trLbl(p.d)+'</b><span class="pv-num">'+(S.x?_tsPxf(p.v):_pvM(p.v,0))+'</span>'+(q?'<span class="pv-num" style="font-size:12px;color:'+_pvC(p.v-q.v)+'">'+_pvP((p.v/q.v-1)*100,2)+' that day</span>':'')+(!S.x&&p.d>=S.s0?'<span class="pv-num" style="font-size:12px">Moved money '+_pvM(p.w,0)+'</span>':'')+'<span class="pv-mut" style="font-size:11.5px">'+(out?'You were out of '+_esc(S.x?_tsShort(S.x):S.m.chain[0]):p.d<S.s0?'Before you moved':'Back in '+_esc(S.x?_tsShort(S.x):'')).trim()+'</span>';
+  tip.style.display='flex';tip.style.left=xp+'%';tip.style.transform='translateX('+(xp>60?'-105%':'12px')+')';}
+function _tsOff(){['ts-rule','ts-tip'].forEach(function(i){const e=el(i);if(e)e.style.display='none';});}
+async function tsLoadPx(from){
+  const b=el('ts-load');if(b){b.disabled=true;b.textContent='Getting prices…';}
+  const ok=await tspFetchRange(from,_trToday());
+  if(!ok&&typeof toast==='function')toast('TSP.gov didn’t answer from the browser — try again later','var(--orange)');
+  tsRender();
+}
+
+function _tsMovesHtml(M){
+  const used=_tsUsed(),mon=new Date().toLocaleDateString('en-US',{month:'long'});
+  let h=_tsHead('TSP · Transfers','Your moves','Every move is graded against staying in the fund you left. Contributions made in between don’t count toward the result.')+'<div class="v2x ts-body">';
+  h+='<div class="ts-top"><span class="ts-chip"><span aria-hidden="true" style="display:inline-flex;gap:4px"><i class="'+(used>=1?'on':'')+'"></i><i class="'+(used>=2?'on':'')+'"></i></span><span><b>'+Math.min(used,2)+' of 2</b> '+mon+' transfers used'+(used>=2?' · more moves this month can only go into G':' · after 2, moves can only go into G')+'</span></span><span class="ts-act"><button type="button" class="pv-lnk" onclick="tsPastOpen()">+ Add a past transfer</button></span></div>';
+  M.open.forEach(function(o){h+=_tsOpenHtml(o);});
+  if(!M.open.length)h+='<div class="pv-card"><span class="pv-mut">No open moves — all of your moved money is back where it started or kept as a permanent change.</span></div>';
+  const cl=M.done,won=cl.filter(function(m){return m.grade==='good';}).length,sum=cl.reduce(function(s,m){return s+m.diff;},0),all=sum+M.open.reduce(function(s,m){return s+m.diff;},0);
+  const sx=cl.length&&cl.every(function(m){return m.dSh!=null&&m.one===cl[0].one;})?cl.reduce(function(s,m){return s+m.dSh;},0):null;
+  h+='<div class="ts-tiles">'+
+    _tsTile('Finished moves vs. never moving',sx!=null?_tsSS(sx)+' <small>'+_tsShort(cl[0].one)+' sh</small>':_pvS(sum,0),(sx!=null?'<span class="pv-num">'+_pvS(sum,0)+'</span> today · ':'')+cl.length+' finished move'+(cl.length===1?'':'s'),cl.length?_pvC(sum):'')+
+    _tsTile('Beat staying put',cl.length?won+' of '+cl.length:'—','Finished moves that came out ahead','')+
+    _tsTile('Including open moves',_pvS(all,0),'At the latest closing prices ('+_tsMD(_tsNowDate())+')',_pvC(all))+'</div>';
+  const rows=M.open.concat(cl).sort(function(a,b){return a.startDate<b.startDate?1:a.startDate>b.startDate?-1:b.id-a.id;});
+  h+='<div class="pv-card"><b class="pv-h">Every move</b><div class="ts-tbl" style="margin-top:8px"><div class="ts-row hd"><span>Dates</span><span>Move</span><span class="r">Days out</span><span class="r">Shares</span><span class="r">Value today</span><span class="r">Result</span></div>'+
+    rows.map(function(m){const end=m.status==='closed'?m.endDate:_tsNowDate(),d=_tsDays(m.startDate,end),tag=m.status==='open'?'<span class="ts-tag open">Open</span>':m.kept?'<span class="ts-tag kept">Kept</span>':'<span class="ts-tag '+m.grade+'">'+(m.grade==='good'?'Won':m.grade==='bad'?'Lost':'Even')+'</span>';
+      const cells='<span>'+_tsMD(m.startDate)+' – '+(m.status==='closed'?_tsMD(m.endDate):'<i>'+(m.kept?'kept':'open')+'</i>')+'</span><span>'+_esc(m.chain.map(function(s){return s.replace(' Fund','');}).join(' → '))+'</span><span class="r pv-num">'+d+'</span>'+
+        '<span class="r pv-num" style="color:'+(m.dSh!=null?_pvC(m.dSh):'var(--muted)')+'">'+(m.dSh!=null?_tsSS(m.dSh)+' '+_tsShort(m.one):'—')+'</span><span class="r pv-num" style="color:'+_pvC(m.diff)+'">'+_pvS(m.diff,0)+'</span><span class="r">'+tag+'</span>';
+      return m.status==='open'?'<div class="ts-row">'+cells+'</div>':'<button type="button" class="ts-row" onclick="tsOpen(\'trip\',\''+m.id+'\')" aria-label="Open the scorecard for '+_esc(m.chain.join(' to '))+'">'+cells+'</button>';}).join('')+'</div></div>';
+  h+='<div class="ts-foot"><span>'+_tsAssume(_tsFwd(0))+'</span></div></div>';
+  return h;
+}
+function _tsOpenHtml(o){
+  const x=o.one,F=_tsFwd(o.diff),now=_tsNowDate(),d=_tsDays(o.startDate,_trToday()),td=_tsTDays(o.startDate,now),inn=o.chain[o.chain.length-2];
+  const l0=o.legs[0],soldTxt=Object.keys(l0.sold).map(function(k){return _tsSh(l0.sold[k])+' '+_tsShort(k)+' @ <span class="pv-num">'+_pvM(_tsPx(l0.P,k),2)+'</span>';}).join(' + ');
+  let h='<div class="pv-card ts-open"><div class="ts-oh"><div><div><span class="ts-tag open">Open</span><span class="ts-ot">In '+_esc(inn)+' since '+_tsMD(o.startDate)+' · '+(x?'waiting to go back to '+_esc(_tspName(x)):'moved out of '+_esc(o.chain[0]))+'</span></div>'+
+    '<div class="pv-mut" style="margin-top:6px">Sold '+soldTxt+' → '+Object.keys(l0.bought).map(function(k){return _tsSh(l0.bought[k])+' '+_tsShort(k);}).join(' + ')+(o.legs.length>1?' (moved again since)':'')+', now worth <span class="pv-num">'+_pvM(o.haveNow,0)+'</span></div></div>'+
+    '<div><div class="pv-mut">'+(x?'If you moved back at the latest close ('+_tsMD(now)+')':'vs. staying in '+_esc(o.chain[0]))+'</div><div class="ts-ob" style="color:'+_pvC(o.diff)+'">'+(x?_tsSS(o.dSh)+' '+_tsShort(x)+' shares':_pvS(o.diff,0))+'</div>'+
+    '<div class="pv-num" style="color:'+_pvC(o.diff)+';font-size:13.5px">'+(x?_pvS(o.diff,0)+' now · ':'')+_pvS(F.real,0)+' at '+(F.fi?'your FI date':'20 years')+' (today’s $)</div></div></div>';
+  if(x&&o.bePx){const pn=o.pn(x),be=o.bePx,wv=parseFloat(((tspWhatIf||{})[o.id]||{}).c)>0?+tspWhatIf[o.id].c:null,lo=Math.min(pn,be,wv||pn)*0.97,hi=Math.max(pn,be,wv||pn)*1.03,pc=function(v){return Math.max(0,Math.min(100,(v-lo)/(hi-lo)*100));};
+    h+='<div><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;font-size:13.5px"><b>Break-even price for '+_esc(_tsShort(x))+'</b><span class="pv-mut">You come back with more shares if '+_esc(_tsShort(x))+' closes below <b class="pv-num" style="color:var(--text)">'+_pvM(be,2)+'</b></span></div>'+
+      '<div class="ts-be" role="img" aria-label="'+_esc(_tsShort(x)+' is at '+_pvM(pn,2)+'; break-even is '+_pvM(be,2))+'"><div class="trk"><i style="width:'+pc(be).toFixed(1)+'%;background:color-mix(in srgb,var(--green) 30%,transparent)"></i><i style="flex:1;background:color-mix(in srgb,var(--red) 24%,transparent)"></i></div>'+
+      '<div class="mk" style="left:'+pc(be).toFixed(1)+'%"></div><div class="now" style="left:'+pc(pn).toFixed(1)+'%"></div>'+(wv?'<div class="wi" style="left:'+pc(wv).toFixed(1)+'%;background:'+(wv<be?'var(--green)':wv>be?'var(--red)':'var(--muted)')+'" title="What-if: '+_esc(_tsShort(x))+' at '+_pvM(wv,2)+'"></div>':'')+
+      '<div class="lb" style="left:'+pc(pn).toFixed(1)+'%;'+(Math.abs(pc(pn)-pc(be))<14?'top:-2px;':'')+'">Today '+_pvM(pn,2)+'</div><div class="lb" style="left:'+pc(be).toFixed(1)+'%">'+_pvM(be,2)+'</div>'+
+      '<span class="side" style="left:0;color:var(--green)">Ahead</span><span class="side" style="right:0;color:var(--red)">Behind</span></div>'+
+      '<div style="display:flex;justify-content:space-between;font:12px \'DM Mono\',monospace;color:var(--muted)"><span>'+_pvM(lo,2)+'</span><span>'+_pvM(hi,2)+'</span></div></div>';}
+  h+=_tsWiHtml(o);
+  const stayR=o.stayNow/o.v0-1,movR=o.haveNow/o.v0-1;
+  h+='<div class="ts-stats"><div><span>Days in '+_esc(inn.replace(' Fund',''))+'</span><b>'+d+' ('+(td.est?'~':'')+td.n+' trading)</b></div>'+
+    '<div><span>'+_esc((x?_tsShort(x):'What you sold')+' since you left')+'</span><b style="color:'+_pvC(stayR)+'">'+_pvP(stayR*100,2)+'</b></div>'+
+    '<div><span>Moved money since</span><b style="color:'+_pvC(movR)+'">'+_pvP(movR*100,2)+'</b></div>'+
+    '<div><span>Moved money now</span><b>'+_pvM(o.haveNow,0)+'</b></div></div>'+
+    '<div class="ts-act"><button type="button" class="pv-lnk" onclick="tsKeep(\''+o.id+'\',true)">Not coming back? Mark it a permanent change</button></div></div>';
+  return h;
+}
+// ── What-if move-back price (open single-fund moves) ──
+// One hypothetical: buy the fund you left back at price X (or X% from your sell price), selling
+// what you're in now at its latest close unless you set a sell price. Shows the same benefit as
+// the round-trip scorecard: shares back, shares vs. staying, dollars, FI-date value, income.
+// Saved per move in tspWhatIf {moveId:{c,g}}.
+function _tsWiCalc(o,c,g){
+  const x=o.one,bk=Object.keys(o.basket).filter(function(k){return o.basket[k]>1e-6;}),inK=bk.length===1?bk[0]:null;
+  const gp=inK&&g>0?g:(inK?o.pn(inK):0);
+  let val=0;bk.forEach(function(k){val+=o.basket[k]*(k===inK?gp:o.pn(k));});
+  const back=c>0?val/c:0,dSh=back-o.stay[x],usd=val-o.stay[x]*c,F=_tsFwd(usd);
+  return {inK:inK,gp:gp,val:val,back:back,dSh:dSh,usd:usd,F:F};
+}
+function _tsWiState(o){const w=(tspWhatIf||{})[o.id]||{},s0=_tsPx(o.legs[0].P,o.one);return {c:parseFloat(w.c)>0?+w.c:null,g:parseFloat(w.g)>0?+w.g:null,s0:s0};}
+function _tsWiOut(o,c,g){
+  const x=o.one,r=_tsWiCalc(o,c,g),col=Math.abs(r.dSh)<0.005?'var(--muted)':r.dSh>0?'var(--green)':'var(--red)';
+  const cell=function(k,v,s){return '<div><span>'+k+'</span><b style="color:'+col+'">'+v+'</b>'+(s?'<em>'+s+'</em>':'')+'</div>';};
+  return cell(_esc(_tsShort(x))+' shares back',_tsSh(r.back),'')+
+    cell('vs. staying',_tsSS(r.dSh)+' sh',_pvP(r.dSh/o.stay[x]*100,1))+
+    cell('Value',_pvS(r.usd,0),'at '+_pvM(c,2))+
+    cell((r.F.fi?'At FI date · ':'In 20 yrs · ')+r.F.yr,_pvS(r.F.real,0),'today’s $')+
+    cell('Income',_pvS(r.F.inc,0)+'/yr','after tax');
+}
+function _tsWiHtml(o){
+  const x=o.one;if(!x||!o.bePx)return '';
+  const st=_tsWiState(o),bk=Object.keys(o.basket).filter(function(k){return o.basket[k]>1e-6;}),inK=bk.length===1?bk[0]:null,id=o.id;
+  const c=st.c,pct=c?(c/st.s0-1)*100:null;
+  let h='<div class="ts-wi"><div class="ts-wih"><b>What if you move back at…</b>'+(c?'<button type="button" class="pv-lnk" onclick="tsWiClear(\''+id+'\')">Clear</button>':'<span class="pv-mut">Enter a '+_esc(_tsShort(x))+' price or a % from your '+_pvM(st.s0,2)+' sell</span>')+'</div>'+
+    '<div class="ts-wif">'+
+      '<label for="ts-wi-c-'+id+'"><span>'+_esc(_tsShort(x))+' price</span><input type="number" id="ts-wi-c-'+id+'" step="0.01" min="0" placeholder="'+_pvM(o.pn(x),2).replace('$','')+'" value="'+(c?_r2(c):'')+'" oninput="tsWiInput(\''+id+'\',\'c\')" onchange="tsWiSave(\''+id+'\')"></label>'+
+      '<span class="ts-wior">or</span>'+
+      '<label for="ts-wi-p-'+id+'"><span>% from your sell</span><input type="number" id="ts-wi-p-'+id+'" step="0.1" placeholder="−3" value="'+(pct!=null?(Math.round(pct*100)/100):'')+'" oninput="tsWiInput(\''+id+'\',\'p\')" onchange="tsWiSave(\''+id+'\')"></label>'+
+      (inK?'<label for="ts-wi-g-'+id+'" class="ts-wig"><span>Sell '+_esc(_tsShort(inK))+' at</span><input type="number" id="ts-wi-g-'+id+'" step="0.0001" min="0" placeholder="'+o.pn(inK).toFixed(4)+'" value="'+(st.g?st.g:'')+'" oninput="tsWiInput(\''+id+'\',\'g\')" onchange="tsWiSave(\''+id+'\')"></label>':'')+
+    '</div>'+
+    '<div class="ts-wio" id="ts-wi-o-'+id+'" aria-live="polite">'+(c?_tsWiOut(o,c,st.g):'')+'</div>'+
+    (inK?'<div class="pv-mut" style="font-size:12px">'+_esc(_tsShort(inK))+' uses its latest close ('+_pvM(o.pn(inK),4).replace(/0+$/,'')+') unless you set a sell price. FI-date value and income use your FIRE plan, as below.</div>':'')+
+  '</div>';
+  return h;
+}
+function _tsWiFind(id){const M=_tsMoves();return M.open.find(function(m){return String(m.id)===String(id);})||null;}
+function tsWiInput(id,src){
+  const o=_tsWiFind(id);if(!o)return;const st=_tsWiState(o),ci=el('ts-wi-c-'+id),pi=el('ts-wi-p-'+id),gi=el('ts-wi-g-'+id);
+  if(src==='p'){const p=parseFloat(pi.value);ci.value=isFinite(p)&&pi.value!==''?_r2(st.s0*(1+p/100)):'';}
+  else if(src==='c'){const c=parseFloat(ci.value);pi.value=c>0?Math.round((c/st.s0-1)*10000)/100:'';}
+  const c=parseFloat(ci.value),g=gi?parseFloat(gi.value):NaN,out=el('ts-wi-o-'+id);
+  if(out)out.innerHTML=c>0?_tsWiOut(o,c,g>0?g:null):'';
+}
+function tsWiSave(id){
+  const ci=el('ts-wi-c-'+id),gi=el('ts-wi-g-'+id),c=parseFloat(ci&&ci.value),g=gi?parseFloat(gi.value):NaN;
+  if(!tspWhatIf||typeof tspWhatIf!=='object')tspWhatIf={};
+  if(c>0)tspWhatIf[id]={c:c,g:g>0?g:null};else delete tspWhatIf[id];
+  if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+  // redraw after the blur/focus settles (redrawing inside 'change' removes the field mid-event)
+  clearTimeout(window._tsWiT);window._tsWiT=setTimeout(function(){const a=document.activeElement,fid=a&&a.id,ss=a&&a.selectionStart;const ov=el('ts-overlay');if(!ov||!ov.classList.contains('open'))return;tsRender();if(fid){const n=el(fid);if(n){n.focus();try{if(ss!=null)n.setSelectionRange(ss,ss);}catch(e){}}}},0);
+}
+function tsWiClear(id){if(tspWhatIf)delete tspWhatIf[id];if(typeof scheduleAutoSave==='function')scheduleAutoSave();tsRender();}
+function tsKeep(id,on){if(!tspMoveFlags||typeof tspMoveFlags!=='object')tspMoveFlags={};if(on)tspMoveFlags[id]='kept';else delete tspMoveFlags[id];
+  if(typeof scheduleAutoSave==='function')scheduleAutoSave();renderTspScore();if(typeof renderAccountsV2==='function'){try{renderAccountsV2();}catch(e){}}
+  tsOpen(on?'trip':'moves',on?id:null);}
+// keep the summary current when prices sync or a transfer is recorded/undone
+(function(){const o=window.recalcTsp;if(typeof o!=='function'||o._ts)return;const w=function(){const r=o.apply(this,arguments);try{renderTspScore();}catch(e){}return r;};w._ts=true;window.recalcTsp=w;})();
+// an open move is worth a card in Accounts → "Worth your attention"
+(function(){const o=window._avInsights;if(typeof o!=='function'||o._ts)return;const w=function(A,sch){const out=o.apply(this,arguments);
+  try{const M=_tsMoves(),m=M.open[0];if(m){const x=m.one;_AV_IC.swap=_AV_IC.swap||'<path d="M7 7h13l-4-4"/><path d="M17 17H4l4 4"/>';
+    out.unshift({ic:'swap',col:'var(--blue)',k:'Open TSP move',fig:x?_tsSS(m.dSh)+' '+_tsShort(x)+' sh':_pvS(m.diff,0),sub:'if you moved back now',
+      txt:'In '+_esc(m.chain[m.chain.length-2])+' since '+_tsMD(m.startDate)+'. '+(x?'You come back with more '+_esc(_tsShort(x))+' shares as long as it closes below '+_pvM(m.bePx,2)+' (latest close '+_pvM(m.pn(x),2)+').':'Compared with staying in '+_esc(m.chain[0])+' you’re '+_pvS(m.diff,0)+'.'),
+      act:'<button type="button" class="pv-lnk" onclick="tsOpen(\'moves\')">See your moves →</button>'});}}catch(e){}
+  return out;};w._ts=true;window._avInsights=w;})();
 
 function inflRate(){const v=val('inflation-rate');return v>0?v/100:CONFIG.inflationRate;}
 // Effective blended (federal+state) tax rate applied to TAXABLE retirement income
