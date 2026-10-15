@@ -2240,6 +2240,7 @@ html.he-lock,html.he-lock body{overflow:hidden}
 #tsp-ift-log details{margin:.4rem .65rem .6rem;font:13px Inter,sans-serif}
 #tsp-ift-log summary{cursor:pointer;color:var(--muted);font-size:12.5px;padding:4px 0}
 #tsp-ift-log .tr-log{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border)}
+#tsp-ift-log .tr-acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;flex:none}#tsp-ift-log .tr-log>span:first-child{min-width:0}#tsp-ift-log .tr-legs{font-family:'DM Mono',monospace;font-size:11.5px!important;opacity:.85}#tsp-ift-log .tr-trip .ts-tag{font-size:10.5px;padding:1px 7px;border-radius:99px;font-weight:600}#tsp-ift-log .ts-tag.good{background:color-mix(in srgb,var(--green) 16%,transparent);color:var(--green)}#tsp-ift-log .ts-tag.bad{background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red)}#tsp-ift-log .ts-tag.even{background:var(--surface2);color:var(--muted)}
 #tsp-ift-log .tr-log em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:2px}
 #tsp-ift-log .btn.sm,#tr-overlay .btn.sm{min-height:36px;padding:0 12px;font-size:13px}
 #tr-overlay .tr-modal{max-width:880px;font-family:Inter,sans-serif;color:var(--text)}
@@ -8955,10 +8956,37 @@ function renderTspIftLog(){
   if(!tspIftLog.length){h.innerHTML='';return;}
   const undo=tspIftLog.find(function(x){return !x.past;});
   const mix=function(o){return Object.keys(o).filter(function(k){return o[k]>0.05;}).sort(function(a,b){return o[b]-o[a];}).map(function(k){return _tspName(k).replace(' Fund','')+' '+Math.round(o[k])+'%';}).join(' · ');};
-  h.innerHTML='<details'+(tspIftLog.length?' open':'')+'><summary>Transfers · '+tspIftLog.length+'</summary>'+tspIftLog.slice(0,8).map(function(t){const f=Object.keys(t.before||{}).filter(function(k){return (parseFloat(t.before[k])||0)-(parseFloat((t.after||{})[k])||0)>1e-6;}),b=Object.keys(t.after||{}).filter(function(k){return (parseFloat(t.after[k])||0)-(parseFloat((t.before||{})[k])||0)>1e-6;});
-    return '<div class="tr-log"><span><b>'+_trLbl(t.date)+'</b> · '+_pvM(t.total,0)+'<em>'+(t.past?f.map(function(k){return _tspName(k).replace(' Fund','');}).join(' + ')+' → '+b.map(function(k){return _tspName(k).replace(' Fund','');}).join(' + ')+' · '+f.map(function(k){return ((parseFloat(t.before[k])||0)-(parseFloat((t.after||{})[k])||0)).toLocaleString('en-US',{maximumFractionDigits:2})+' sh';}).join(' + ')+' · added as a past transfer':mix(t.from)+' → '+mix(t.to))+'</em></span>'+
-      (t.past?'<button type="button" class="btn sm" onclick="tsPastDel(\''+t.id+'\')">Remove</button>':(t===undo?'<button type="button" class="btn sm" onclick="tspIftUndo()">Undo</button>':''))+'</div>';}).join('')+
+  const sh=function(n){return n.toLocaleString('en-US',{maximumFractionDigits:2});};
+  // round trips: each shows once, as one row, at its first transfer
+  let M=null;try{M=_tsMoves();}catch(e){}
+  const grp={},seen={};
+  (M?M.done:[]).filter(function(m){return m.back&&m.legs.length>=2;}).forEach(function(m){if(m.legs.some(function(l){return seen[l.id];}))return;m.legs.forEach(function(l){seen[l.id]=m;});grp[m.legs[0].id]=m;});
+  const rows=[];tspIftLog.forEach(function(t){const m=seen[t.id];if(!m){rows.push({t:t});return;}if(grp[t.id]){rows.push({m:m});}});
+  // a trip's row sorts by its first transfer, which is later in the newest-first log; re-sort by start date
+  rows.sort(function(x,y){const a=x.m?x.m.startDate:(x.t.pxDate||x.t.date),b=y.m?y.m.startDate:(y.t.pxDate||y.t.date);return a<b?1:a>b?-1:0;});
+  const legRow=function(t){const f=Object.keys(t.before||{}).filter(function(k){return (parseFloat(t.before[k])||0)-(parseFloat((t.after||{})[k])||0)>1e-6;}),b=Object.keys(t.after||{}).filter(function(k){return (parseFloat(t.after[k])||0)-(parseFloat((t.before||{})[k])||0)>1e-6;});
+    return t.past?f.map(function(k){return _tspName(k).replace(' Fund','');}).join(' + ')+' → '+b.map(function(k){return _tspName(k).replace(' Fund','');}).join(' + ')+' · '+f.map(function(k){return sh((parseFloat(t.before[k])||0)-(parseFloat((t.after||{})[k])||0))+' sh';}).join(' + '):mix(t.from)+' → '+mix(t.to);};
+  const html=rows.slice(0,8).map(function(r){
+    if(r.m){const m=r.m,ents=m.legs.map(function(l){return tspIftLog.find(function(t){return String(t.id)===String(l.id);});}).filter(Boolean),allPast=ents.every(function(t){return t.past;}),tag=m.grade==='good'?'Won':m.grade==='bad'?'Lost':'Even';
+      return '<div class="tr-log tr-trip"><span><b>'+_trLbl(m.startDate).replace(/, \d{4}$/,'')+' – '+_trLbl(m.endDate)+'</b> · <span class="ts-tag '+m.grade+'">'+tag+'</span> <span class="pv-num" style="color:'+_pvC(m.diff)+'">'+(m.dSh!=null?_tsSS(m.dSh)+' '+_tsShort(m.one)+' sh · ':'')+_pvS(m.diff,0)+'</span>'+
+        '<em>Round trip · '+_esc(m.chain.map(function(s){return s.replace(' Fund','');}).join(' → '))+'</em>'+
+        '<em class="tr-legs">'+ents.map(function(t){return _trLbl(t.date).replace(/, \d{4}$/,'')+': '+legRow(t);}).join('<br>')+'</em></span>'+
+        '<span class="tr-acts"><button type="button" class="btn sm" onclick="tsOpen(\'trip\',\''+m.id+'\')">Scorecard</button>'+
+        (allPast&&ents.length===2?'<button type="button" class="btn sm" onclick="tsPastEdit(\''+ents[0].id+'\')">Edit</button>':'')+
+        (allPast?'<button type="button" class="btn sm" onclick="tsPastDelTrip(\''+m.legs.map(function(l){return l.id;}).join(',')+'\')">Remove</button>':(ents.indexOf(undo)>=0?'<button type="button" class="btn sm" onclick="tspIftUndo()">Undo</button>':''))+'</span></div>';}
+    const t=r.t;
+    return '<div class="tr-log"><span><b>'+_trLbl(t.date)+'</b> · '+_pvM(t.total,0)+'<em>'+legRow(t)+(t.past?' · added as a past transfer':'')+'</em></span>'+
+      '<span class="tr-acts">'+(t.past?'<button type="button" class="btn sm" onclick="tsPastEdit(\''+t.id+'\')">Edit</button><button type="button" class="btn sm" onclick="tsPastDel(\''+t.id+'\')">Remove</button>':(t===undo?'<button type="button" class="btn sm" onclick="tspIftUndo()">Undo</button>':''))+'</span></div>';}).join('');
+  h.innerHTML='<details open><summary>Transfers · '+tspIftLog.length+'</summary>'+html+
     '<div style="padding:8px 0 2px;border-top:1px solid var(--border)"><button type="button" class="pv-lnk" style="font-size:12.5px" onclick="tsPastOpen()">+ Add a past transfer</button></div></details>';
+}
+function tsPastDelTrip(ids){
+  const L=String(ids).split(','),E=(tspIftLog||[]).filter(function(t){return L.indexOf(String(t.id))>=0&&t.past;});if(!E.length)return;
+  confirmDelete('Remove this round trip ('+E.length+' past transfers) from your log? Fund shares don’t change.',function(){
+    tspIftLog=tspIftLog.filter(function(t){return E.indexOf(t)<0;});E.forEach(function(t){if(tspMoveFlags)delete tspMoveFlags[t.id];if(tspWhatIf)delete tspWhatIf[t.id];});
+    renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();toast('Round trip removed');
+    const ov=el('ts-overlay');if(ov&&ov.classList.contains('open'))tsOpen('moves');
+  },'Remove round trip?','Yes, remove');
 }
 
 
@@ -8968,8 +8996,8 @@ function renderTspIftLog(){
 // and NEVER change current fund shares. Prices come from saved closes, TSP.gov, or typed in.
 let _tpx=null;
 function _tpxOpts(sel,skip){return TSP_FUNDS.filter(function(f){return f[0]===sel||skip.indexOf(f[0])<0;}).map(function(f){return '<option value="'+f[0]+'"'+(f[0]===sel?' selected':'')+'>'+_esc(f[1])+'</option>';}).join('');}
-function tsPastOpen(){
-  _tpx={d:'',out:[{k:'C',sh:'',hb:''}],to:[{k:'G',p:100}],px1:{},auto1:{},pxd1:'',back:false,bd:'',bk:[{k:'C',p:100}],px2:{},auto2:{},pxd2:''};
+function tsPastOpen(pre){
+  _tpx=pre||{d:'',out:[{k:'C',sh:'',hb:''}],to:[{k:'G',p:100}],px1:{},auto1:{},pxd1:'',back:false,bd:'',bk:[{k:'C',p:100}],px2:{},auto2:{},pxd2:''};
   let ov=el('tpx-overlay');
   if(!ov){ov=document.createElement('div');ov.id='tpx-overlay';ov.className='modal-overlay';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','tpx-title');document.body.appendChild(ov);
     ov.addEventListener('click',function(e){if(e.target===ov)tsPastClose();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open'))tsPastClose();});}
@@ -9029,7 +9057,7 @@ function _tpxRender(){
   const n1=_tpxAutoPx(1);_tpxSyncBack();const n2=_tpx.back?_tpxAutoPx(2):'';
   const L=function(f,t){return '<label class="pf-lbl" style="display:block" for="'+f+'">'+t+'</label>';},W='width:100%;box-sizing:border-box',H=function(t){return '<div class="tpx-h">'+t+'</div>';};
   ov.innerHTML='<div class="modal tpx-modal" style="max-width:540px">'+
-    '<div class="modal-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.8rem"><div><h2 id="tpx-title" style="font-size:1.1rem;margin:0">Add a past transfer</h2>'+
+    '<div class="modal-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.8rem"><div><h2 id="tpx-title" style="font-size:1.1rem;margin:0">'+(_tpx.editIds?(_tpx.editIds.length>1?'Edit round trip':'Edit past transfer'):'Add a past transfer')+'</h2>'+
     '<div style="font-size:.6rem;color:var(--muted);margin-top:.25rem">For the scorecard only. Your current fund shares don’t change.</div></div><button class="modal-close" type="button" onclick="tsPastClose()" aria-label="Close">&times;</button></div>'+
     '<div class="tpx-g">'+
       '<div>'+L('tpx-dt','Transfer date')+'<input type="date" id="tpx-dt" max="'+_trToday()+'" value="'+_tpx.d+'" style="'+W+'" onchange="tpxSet(\'d\',this.value,1)"></div>'+
@@ -9041,7 +9069,7 @@ function _tpxRender(){
     (_tpx.back?'<div class="tpx-g"><div>'+L('tpx-bdt','Moved back on')+'<input type="date" id="tpx-bdt" max="'+_trToday()+'" value="'+_tpx.bd+'" style="'+W+'" onchange="tpxSet(\'bd\',this.value,1)"></div><div></div></div>'+
       H('Moved back into')+_tpxMixHtml(2)+_tpxPxHtml(2)+'<div class="tpx-n">'+n2+'</div>':'')+
     '<div id="tpx-prev" aria-live="polite" class="tpx-prev"></div>'+
-    '<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap"><button class="btn" type="button" onclick="tsPastClose()">Cancel</button><button class="btn primary" type="button" id="tpx-go" onclick="tsPastSave()">'+(_tpx.back?'Add round trip':'Add transfer')+'</button></div>'+
+    '<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap"><button class="btn" type="button" onclick="tsPastClose()">Cancel</button><button class="btn primary" type="button" id="tpx-go" onclick="tsPastSave()">'+(_tpx.editIds?'Save changes':(_tpx.back?'Add round trip':'Add transfer'))+'</button></div>'+
   '</div>';
   tsPastPrev();
 }
@@ -9082,7 +9110,7 @@ function _tsPastRead(){
       let stayV=0;O.forEach(function(o){stayV+=o.sh*p2[o.k];});const one=O.length===1?O[0]:null;
       rt={usd:V2-stayV,stayV:stayV,pct:stayV>0?(V2/stayV-1)*100:0,eq:one?V2/p2[one.k]-one.sh:null,one:one,pure:!!one&&T.bk.length===1&&T.bk[0].k===one.k};}
   }
-  const dup=!err&&(tspIftLog||[]).some(function(x){const xd=x.pxDate||x.date;return (xd===T.pxd1||x.date===T.d)&&O.some(function(o){return ((parseFloat((x.before||{})[o.k])||0)-(parseFloat((x.after||{})[o.k])||0))>0;});});
+  const dup=!err&&(tspIftLog||[]).some(function(x){if(T.editIds&&T.editIds.map(String).indexOf(String(x.id))>=0)return false;const xd=x.pxDate||x.date;return (xd===T.pxd1||x.date===T.d)&&O.some(function(o){return ((parseFloat((x.before||{})[o.k])||0)-(parseFloat((x.after||{})[o.k])||0))>0;});});
   return {T:T,O:O,V:V,bought:bought,V2:V2,backSh:backSh,rt:rt,err:err,dup:dup};
 }
 function tsPastPrev(){
@@ -9105,20 +9133,22 @@ function tsPastPrev(){
 }
 function tsPastSave(){
   const r=_tsPastRead();if(r.err){toast(r.err,'var(--red)');return;}
-  const T=r.T,id=Date.now(),b1={},a1={},p1={},f1={},t1={},outHas={};
+  const T=r.T,id=T.editIds?T.editIds[0]:Date.now(),b1={},a1={},p1={},f1={},t1={},outHas={};
   r.O.forEach(function(o){b1[o.k]=o.hb;a1[o.k]=_r2x(o.hb-o.sh);f1[o.k]=r.V>0?_r2(o.sh*T.px1[o.k]/r.V*100):0;outHas[o.k]=o.hb-o.sh;});
   Object.keys(r.bought).forEach(function(k){b1[k]=0;a1[k]=_r2x(r.bought[k]);});
   _tpxFunds1().forEach(function(k){p1[k]=+T.px1[k];});T.to.forEach(function(x){t1[x.k]=x.p;});
+  if(T.editIds){const ids=T.editIds.map(String);tspIftLog=tspIftLog.filter(function(x){return ids.indexOf(String(x.id))<0;});if(T.editIds[1]&&!r.rt){if(tspMoveFlags)delete tspMoveFlags[T.editIds[1]];if(tspWhatIf)delete tspWhatIf[T.editIds[1]];}}
   tspIftLog.push({id:id,date:T.d,pxDate:T.pxd1||T.d,total:_r2(r.V),before:b1,after:a1,prices:p1,from:f1,to:t1,past:true});
   if(r.rt){const b2={},a2={},p2={},f2={},t2={},ks=_tpxFunds2();
     ks.forEach(function(k){const bef=(r.bought[k]||0)+(outHas[k]||0);b2[k]=_r2x(bef);a2[k]=_r2x(bef-(r.bought[k]||0)+(r.backSh[k]||0));p2[k]=+T.px2[k];});
     Object.keys(r.bought).forEach(function(k){f2[k]=r.V2>0?_r2(r.bought[k]*T.px2[k]/r.V2*100):0;});T.bk.forEach(function(x){t2[x.k]=x.p;});
-    tspIftLog.push({id:id+1,date:T.bd,pxDate:T.pxd2||T.bd,total:_r2(r.V2),before:b2,after:a2,prices:p2,from:f2,to:t2,past:true});}
+    tspIftLog.push({id:(T.editIds&&T.editIds[1])||id+1,date:T.bd,pxDate:T.pxd2||T.bd,total:_r2(r.V2),before:b2,after:a2,prices:p2,from:f2,to:t2,past:true});}
   tspIftLog.sort(function(a,b){const x=a.pxDate||a.date,y=b.pxDate||b.date;return x<y?1:x>y?-1:b.id-a.id;});
   tspIftLog=tspIftLog.slice(0,60);
   const rt=r.rt,fr=r.O.map(function(o){return _tsShort(o.k);}).join('/'),to=Object.keys(r.bought).map(_tsShort).join('/');
-  tsPastClose();renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();
-  if(rt){toast('Round trip added · '+(rt.eq!=null?_tsSS(rt.eq)+' '+_tsShort(rt.one.k)+' shares'+(rt.pure?'':' equiv.'):_pvS(rt.usd,0)+' vs. staying'));tsOpen('trip',String(id));return;}
+  const wasEdit=!!T.editIds;tsPastClose();renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();
+  if(wasEdit&&typeof toast==='function')toast('Changes saved');
+  if(rt){if(wasEdit){tsOpen('trip',String(id));return;}toast('Round trip added · '+(rt.eq!=null?_tsSS(rt.eq)+' '+_tsShort(rt.one.k)+' shares'+(rt.pure?'':' equiv.'):_pvS(rt.usd,0)+' vs. staying'));tsOpen('trip',String(id));return;}
   toast('Past transfer added · '+fr+' → '+to+' on '+_trLbl(T.d));
   const ov=el('ts-overlay');if(ov&&ov.classList.contains('open'))tsOpen('moves');
 }
@@ -9129,6 +9159,24 @@ function tsPastDel(id){
     renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();toast('Past transfer removed');
     const ov=el('ts-overlay');if(ov&&ov.classList.contains('open'))tsOpen('moves');
   },'Remove past transfer?','Yes, remove');
+}
+// ── edit a past transfer (or a past round trip as a whole) ──
+function _tpxDelta(e){const o={};Object.keys(e.before||{}).concat(Object.keys(e.after||{})).forEach(function(k){o[k]=(parseFloat((e.after||{})[k])||0)-(parseFloat((e.before||{})[k])||0);});return o;}
+function _tpxMixFrom(e,keys){const P=e.prices||{},d=_tpxDelta(e);let tot=0;const v={};keys.forEach(function(k){v[k]=Math.max(0,d[k])*(parseFloat(P[k])||0);tot+=v[k];});
+  const L=keys.map(function(k){return {k:k,p:tot>0?Math.round(v[k]/tot*10000)/100:Math.round(100/keys.length)};});const s=L.reduce(function(a,r){return a+r.p;},0);if(L.length)L[0].p=Math.round((L[0].p+100-s)*100)/100;return L;}
+// the round trip (closed, two legs, both past) that starts with this entry, if any
+function _tpxTripOf(id){try{const M=_tsMoves();const m=M.done.find(function(x){return x.back&&x.legs.length===2&&x.legs.some(function(l){return String(l.id)===String(id);});});
+  if(!m)return null;const a=tspIftLog.find(function(t){return String(t.id)===String(m.legs[0].id);}),b=tspIftLog.find(function(t){return String(t.id)===String(m.legs[1].id);});
+  return a&&b&&a.past&&b.past&&a!==b?{a:a,b:b,m:m}:null;}catch(e){return null;}}
+function tsPastEdit(id){
+  const e=(tspIftLog||[]).find(function(t){return String(t.id)===String(id);});if(!e||!e.past)return;
+  const tr=_tpxTripOf(id),a=tr?tr.a:e,b=tr?tr.b:null,d=_tpxDelta(a);
+  const out=Object.keys(d).filter(function(k){return d[k]<-1e-9;}).map(function(k){const sh=-d[k],hb=parseFloat(a.before[k])||0;return {k:k,sh:String(_r2x(sh)),hb:Math.abs(hb-sh)<1e-6?'':String(_r2x(hb))};});
+  const toK=Object.keys(d).filter(function(k){return d[k]>1e-9;});
+  const T={d:a.date,out:out,to:_tpxMixFrom(a,toK),px1:Object.assign({},a.prices),auto1:{},pxd1:a.pxDate||a.date,back:!!b,bd:b?b.date:'',bk:[],px2:b?Object.assign({},b.prices):{},auto2:{},pxd2:b?(b.pxDate||b.date):'',bkEdited:true,editIds:[a.id].concat(b?[b.id]:[])};
+  if(b){const d2=_tpxDelta(b);T.bk=_tpxMixFrom(b,Object.keys(d2).filter(function(k){return d2[k]>1e-9;}));}
+  else T.bk=out.map(function(r){return {k:r.k,p:Math.round(100/out.length)};});
+  tsPastOpen(T);
 }
 
 // ===== TSP trade scorecard — every interfund transfer graded against staying in the fund you left =====
@@ -9271,7 +9319,7 @@ function _tsTripHtml(m,M){
   const col=_pvC(m.diff);
   let h=_tsHead('TSP · Transfer scorecard',title,sub)+'<div class="v2x ts-body">';
   h+='<div class="ts-top"><span class="ts-pill '+m.grade+'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic+'</svg>'+_tsGradeTxt(m.grade)+'</span>'+
-    '<span class="ts-act">'+(M.open.length||M.done.length>1?'<button type="button" class="pv-lnk" onclick="tsOpen(\'moves\')">All your moves →</button>':'')+(m.kept?'<button type="button" class="pv-lnk" onclick="tsKeep(\''+m.id+'\',false)">Track as an open move again</button>':'')+'</span></div>';
+    '<span class="ts-act">'+(typeof _tpxTripOf==='function'&&_tpxTripOf(m.legs[0].id)?'<button type="button" class="pv-lnk" onclick="tsClose();tsPastEdit(\''+m.legs[0].id+'\')">Edit round trip</button>':'')+(M.open.length||M.done.length>1?'<button type="button" class="pv-lnk" onclick="tsOpen(\'moves\')">All your moves →</button>':'')+(m.kept?'<button type="button" class="pv-lnk" onclick="tsKeep(\''+m.id+'\',false)">Track as an open move again</button>':'')+'</span></div>';
   // tiles
   h+='<div class="ts-tiles">';
   if(m.dSh!=null)h+=_tsTile(m.mixBack?'Shares (equivalent)':'Shares',_tsSS(m.dSh),(m.mixBack?'Your '+_esc(m.chain[m.chain.length-1])+' mix, counted in '+_tsShort(x)+' shares, vs. staying':_tsShort(x)+' shares '+(m.dSh>=0?'more':'fewer')+' than if you’d stayed')+' · <span class="pv-num">'+_pvP(m.dSh/m.stay[x]*100,1)+'</span>',col);
