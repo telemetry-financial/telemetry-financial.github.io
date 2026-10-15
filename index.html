@@ -2333,6 +2333,29 @@ html.he-lock,html.he-lock body{overflow:hidden}
 #ts-overlay .ts-be .now{position:absolute;top:14px;width:26px;height:26px;margin-left:-13px;border-radius:50%;background:var(--accent);border:3px solid var(--surface);box-sizing:border-box;box-shadow:0 2px 6px rgba(0,0,0,.2)}
 #ts-overlay .ts-be .lb{position:absolute;top:42px;transform:translateX(-50%);font:12px 'DM Mono',monospace;white-space:nowrap}
 #ts-overlay .ts-be .side{position:absolute;top:0;font-size:12px;font-weight:600}
+#tpx-overlay .pv-lnk{border:0;background:none;padding:0;font:inherit;font-weight:600;color:var(--accent);cursor:pointer}#tpx-overlay .pv-lnk:hover{text-decoration:underline}#tpx-overlay .pv-lnk:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#tpx-overlay .tpx-or{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr) 28px;gap:.5rem;align-items:center;margin-bottom:.35rem}
+#tpx-overlay .tpx-or select,#tpx-overlay .tpx-or input{width:100%;box-sizing:border-box;min-width:0}
+#tpx-overlay .tpx-or input{text-align:right}
+#tpx-overlay .tpx-orh{font-size:.55rem;color:var(--muted);margin-bottom:.2rem}
+#tpx-overlay .tpx-orh em{font-style:normal;opacity:.8}
+@media (max-width:480px){#tpx-overlay .tpx-or{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 28px}#tpx-overlay .tpx-or select{grid-column:1/-1}#tpx-overlay .tpx-orh span:first-child{display:none}#tpx-overlay .tpx-orh{grid-template-columns:minmax(0,1fr) minmax(0,1fr) 28px}}
+#tpx-overlay .tpx-g{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem .7rem}
+#tpx-overlay .tpx-h{font-size:.6rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:.85rem 0 .35rem}
+#tpx-overlay .tpx-mr{display:grid;grid-template-columns:minmax(0,1fr) auto 28px;gap:.5rem;align-items:center;margin-bottom:.35rem}
+#tpx-overlay .tpx-mr select{width:100%;box-sizing:border-box;min-width:0}
+#tpx-overlay .tpx-pc{display:inline-flex;align-items:center;gap:.25rem;font-size:.66rem}
+#tpx-overlay .tpx-pc input{width:72px;text-align:right}
+#tpx-overlay .tpx-x{border:0;background:transparent;color:var(--muted);font-size:1.1rem;cursor:pointer;line-height:1}
+#tpx-overlay .tpx-x:hover{color:var(--red)}
+#tpx-overlay .tpx-mf{display:flex;justify-content:space-between;gap:1rem;font-size:.6rem;margin:.1rem 0 .5rem}
+#tpx-overlay .tpx-px{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.5rem .6rem}
+#tpx-overlay .tpx-px label{display:flex;flex-direction:column;gap:.2rem;font-size:.58rem;color:var(--muted);min-width:0}
+#tpx-overlay .tpx-px input{width:100%;box-sizing:border-box;text-align:right}
+#tpx-overlay .tpx-n{font-size:.58rem;color:var(--muted);margin-top:.35rem;line-height:1.5}
+#tpx-overlay .tpx-ck{display:flex;align-items:center;gap:.45rem;margin-top:.85rem;font-size:.66rem;font-weight:600;cursor:pointer}
+#tpx-overlay .tpx-prev{margin-top:.8rem;border:1px solid var(--border);border-radius:10px;padding:.6rem .8rem;font-size:.64rem;line-height:1.75;overflow-wrap:anywhere}
+#tpx-overlay .tpx-modal{max-height:92vh;overflow-y:auto}
 #ts-overlay .ts-be .wi{position:absolute;top:17px;width:20px;height:20px;margin-left:-10px;border-radius:50%;border:3px solid var(--surface);box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,.25)}
 #ts-overlay .ts-wi{border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--surface2)}
 #ts-overlay .ts-wih{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:4px 14px;font-size:13.5px}
@@ -8940,123 +8963,163 @@ function renderTspIftLog(){
 
 
 // ── Past transfers (log only) ──
-// Adds an interfund transfer that already happened, so the scorecard can grade it. It goes into
-// tspIftLog in date order with past:true and NEVER changes current fund shares (those already
-// reflect it). Prices come from saved TSP closes for that date, TSP.gov, or typed in.
+// Adds interfund transfers that already happened so the scorecard can grade them. Each leg can go
+// into a mix of funds (e.g. 80% C / 20% S). Entries go into tspIftLog in date order with past:true
+// and NEVER change current fund shares. Prices come from saved closes, TSP.gov, or typed in.
 let _tpx=null;
+function _tpxOpts(sel,skip){return TSP_FUNDS.filter(function(f){return f[0]===sel||skip.indexOf(f[0])<0;}).map(function(f){return '<option value="'+f[0]+'"'+(f[0]===sel?' selected':'')+'>'+_esc(f[1])+'</option>';}).join('');}
 function tsPastOpen(){
-  _tpx={pxDate:'',how:''};
+  _tpx={d:'',out:[{k:'C',sh:'',hb:''}],to:[{k:'G',p:100}],px1:{},auto1:{},pxd1:'',back:false,bd:'',bk:[{k:'C',p:100}],px2:{},auto2:{},pxd2:''};
   let ov=el('tpx-overlay');
   if(!ov){ov=document.createElement('div');ov.id='tpx-overlay';ov.className='modal-overlay';ov.setAttribute('role','dialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','tpx-title');document.body.appendChild(ov);
     ov.addEventListener('click',function(e){if(e.target===ov)tsPastClose();});document.addEventListener('keydown',function(e){if(e.key==='Escape'&&ov.classList.contains('open'))tsPastClose();});}
-  const opt=function(sel){return TSP_FUNDS.map(function(f){return '<option value="'+f[0]+'"'+(f[0]===sel?' selected':'')+'>'+_esc(f[1])+'</option>';}).join('');};
-  const L=function(f,t){return '<label class="pf-lbl" style="display:block" for="'+f+'">'+t+'</label>';},W='width:100%;box-sizing:border-box';
-  ov.innerHTML='<div class="modal" style="max-width:500px">'+
-    '<div class="modal-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.9rem"><div><h2 id="tpx-title" style="font-size:1.1rem;margin:0">Add a past transfer</h2>'+
-    '<div style="font-size:.6rem;color:var(--muted);margin-top:.25rem">For the scorecard only. Your current fund shares don’t change.</div></div><button class="modal-close" type="button" onclick="tsPastClose()" aria-label="Close">&times;</button></div>'+
-    '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem .7rem">'+
-      '<div>'+L('tpx-dt','Transfer date')+'<input type="date" id="tpx-dt" max="'+_trToday()+'" style="'+W+'" onchange="tsPastPx()"></div><div></div>'+
-      '<div>'+L('tpx-f','Moved out of')+'<select id="tpx-f" style="'+W+'" onchange="tsPastPx()">'+opt('C')+'</select></div>'+
-      '<div>'+L('tpx-t','Moved into')+'<select id="tpx-t" style="'+W+'" onchange="tsPastPx()">'+opt('G')+'</select></div>'+
-      '<div>'+L('tpx-sh','Shares sold')+'<input type="number" id="tpx-sh" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
-      '<div>'+L('tpx-hb','Shares you had in it')+'<input type="number" id="tpx-hb" step="0.0001" min="0" placeholder="Same — moved it all" style="'+W+'" oninput="tsPastPrev()"></div>'+
-      '<div>'+L('tpx-pf','<span id="tpx-pfl">Sell price</span>')+'<input type="number" id="tpx-pf" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
-      '<div>'+L('tpx-pt','<span id="tpx-ptl">Buy price</span>')+'<input type="number" id="tpx-pt" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
-    '</div>'+
-    '<div id="tpx-pxs" style="font-size:.58rem;color:var(--muted);margin-top:.45rem;min-height:1.2em"></div>'+
-    '<label style="display:flex;align-items:center;gap:.45rem;margin-top:.7rem;font-size:.66rem;font-weight:600;cursor:pointer"><input type="checkbox" id="tpx-back" onchange="tsPastBack()"> I moved back into <span id="tpx-bkf">C Fund</span> (round trip)</label>'+
-    '<div id="tpx-bw" style="display:none;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem .7rem;margin-top:.55rem">'+
-      '<div>'+L('tpx-bdt','Moved back on')+'<input type="date" id="tpx-bdt" max="'+_trToday()+'" style="'+W+'" onchange="tsPastPx2()"></div><div></div>'+
-      '<div>'+L('tpx-bpt','<span id="tpx-bptl">Sell price</span>')+'<input type="number" id="tpx-bpt" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
-      '<div>'+L('tpx-bpf','<span id="tpx-bpfl">Buy-back price</span>')+'<input type="number" id="tpx-bpf" step="0.0001" min="0" style="'+W+'" oninput="tsPastPrev()"></div>'+
-      '<div id="tpx-bpxs" style="grid-column:1/-1;font-size:.58rem;color:var(--muted)"></div>'+
-    '</div>'+
-    '<div id="tpx-prev" aria-live="polite" style="margin-top:.6rem;border:1px solid var(--border);border-radius:10px;padding:.6rem .8rem;font-size:.64rem;line-height:1.75;overflow-wrap:anywhere"></div>'+
-    '<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap"><button class="btn" type="button" onclick="tsPastClose()">Cancel</button><button class="btn primary" type="button" id="tpx-go" onclick="tsPastSave()">Add transfer</button></div>'+
-  '</div>';
-  ov.classList.add('open');tsPastPx();
+  ov.classList.add('open');_tpxRender();
   setTimeout(function(){const d=el('tpx-dt');if(d)d.focus();},30);
 }
 function tsPastClose(){const ov=el('tpx-overlay');if(ov)ov.classList.remove('open');_tpx=null;}
-// fill prices from saved closes for the chosen date (only into empty boxes or ones we filled)
-function tsPastPx(){
-  if(!_tpx)return;const d=(el('tpx-dt')||{}).value,f=(el('tpx-f')||{}).value,t=(el('tpx-t')||{}).value,box=el('tpx-pxs');
-  const lf=el('tpx-pfl'),lt=el('tpx-ptl');if(lf)lf.textContent=_tsShort(f)+' sell price';if(lt)lt.textContent=_tsShort(t)+' buy price';
-  const bk=el('tpx-bkf'),b1=el('tpx-bptl'),b2=el('tpx-bpfl');if(bk)bk.textContent=_tspName(f);if(b1)b1.textContent=_tsShort(t)+' sell price';if(b2)b2.textContent=_tsShort(f)+' buy-back price';
-  if(el('tpx-back')&&el('tpx-back').checked)tsPastPx2(true);
-  if(!d){if(box)box.textContent='';tsPastPrev();return;}
-  const P=tspPricesFor(d),pf=el('tpx-pf'),pt=el('tpx-pt');
-  const exact=P&&(P.how==='exact'||P.how==='next')&&_tsPx(P.prices,f)>0&&_tsPx(P.prices,t)>0;
-  if(exact){
-    if(!pf.value||pf.dataset.auto==='1'){pf.value=_tsPx(P.prices,f);pf.dataset.auto='1';}
-    if(!pt.value||pt.dataset.auto==='1'){pt.value=_tsPx(P.prices,t);pt.dataset.auto='1';}
-    _tpx.pxDate=P.date;
-    box.innerHTML='Closing prices from '+_trLbl(P.date)+(P.how==='next'?' (next trading day)':'')+'. Type over them if your confirmation shows different prices.';
-  }else{
-    _tpx.pxDate=d;
-    box.innerHTML='No saved closes for '+_trLbl(d)+'. <button type="button" class="pv-lnk" id="tpx-get" onclick="tsPastFetch()">Get them from TSP.gov</button> or type the prices from your transaction history.';
-  }
+function _tpxOutK(){return _tpx.out.map(function(r){return r.k;});}
+// funds needing a price on each date
+function _tpxFunds1(){const s=_tpxOutK().slice();_tpx.to.forEach(function(r){if(s.indexOf(r.k)<0)s.push(r.k);});return s;}
+function _tpxFunds2(){const s=[];_tpx.to.forEach(function(r){if(s.indexOf(r.k)<0)s.push(r.k);});_tpx.bk.forEach(function(r){if(s.indexOf(r.k)<0)s.push(r.k);});_tpxOutK().forEach(function(k){if(s.indexOf(k)<0)s.push(k);});return s;}
+// fill saved closes into price boxes that are empty or that we filled before
+function _tpxAutoPx(leg){
+  const d=leg===1?_tpx.d:_tpx.bd,px=leg===1?_tpx.px1:_tpx.px2,au=leg===1?_tpx.auto1:_tpx.auto2,ks=leg===1?_tpxFunds1():_tpxFunds2();
+  if(!d){return '';}
+  const P=tspPricesFor(d),ok=P&&(P.how==='exact'||P.how==='next');
+  if(leg===1)_tpx.pxd1=ok?P.date:d;else _tpx.pxd2=ok?P.date:d;
+  let miss=0;ks.forEach(function(k){const v=ok?_tsPx(P.prices,k):0;if(v>0&&(!(parseFloat(px[k])>0)||au[k])){px[k]=v;au[k]=true;}if(!(parseFloat(px[k])>0))miss++;});
+  return ok?('Closing prices from '+_trLbl(P.date)+(P.how==='next'?' (next trading day)':'')+'. Type over any that differ from your confirmation.'+(miss?' '+miss+' still needed.':'')):
+    ('No saved closes for '+_trLbl(d)+'. <button type="button" class="pv-lnk" onclick="tsPastFetch('+leg+')">Get them from TSP.gov</button> or type them from your transaction history.');
+}
+function _tpxMixHtml(leg){
+  const L=leg===1?_tpx.to:_tpx.bk,skipBase=leg===1?_tpxOutK():[];
+  const used=L.map(function(r){return r.k;}),sum=L.reduce(function(s,r){return s+(parseFloat(r.p)||0);},0);
+  return L.map(function(r,i){const skip=skipBase.concat(used.filter(function(k,j){return j!==i;}));
+      return '<div class="tpx-mr"><select aria-label="Fund '+(i+1)+'" onchange="tpxMix('+leg+','+i+',\'k\',this.value)">'+_tpxOpts(r.k,skip)+'</select>'+
+        '<span class="tpx-pc"><input type="number" min="0" max="100" step="1" value="'+r.p+'" aria-label="Percent into '+_esc(_tspName(r.k))+'" oninput="tpxMix('+leg+','+i+',\'p\',this.value,1)">%</span>'+
+        (L.length>1?'<button type="button" class="tpx-x" aria-label="Remove '+_esc(_tspName(r.k))+'" onclick="tpxMixDel('+leg+','+i+')">&times;</button>':'<span></span>')+'</div>';}).join('')+
+    '<div class="tpx-mf"><button type="button" class="pv-lnk" onclick="tpxMixAdd('+leg+')">+ Add a fund</button><span id="tpx-sum'+leg+'" style="color:'+(Math.abs(sum-100)<0.05?'var(--green)':'var(--red)')+'">'+sum.toFixed(0)+'% of 100%</span></div>';
+}
+function _tpxOutHtml(){
+  const used=_tpxOutK().concat(_tpx.to.map(function(r){return r.k;}));
+  return '<div class="tpx-or tpx-orh"><span>Fund</span><span>Shares sold</span><span>Shares you had <em>(if not all)</em></span><span></span></div>'+
+    _tpx.out.map(function(r,i){const skip=used.filter(function(k){return k!==r.k;});
+      return '<div class="tpx-or"><select aria-label="Moved out of, fund '+(i+1)+'" onchange="tpxOut('+i+',\'k\',this.value)">'+_tpxOpts(r.k,skip)+'</select>'+
+        '<input type="number" step="0.0001" min="0" value="'+r.sh+'" aria-label="'+_esc(_tspName(r.k))+' shares sold" oninput="tpxOut('+i+',\'sh\',this.value,1)">'+
+        '<input type="number" step="0.0001" min="0" placeholder="All" value="'+r.hb+'" aria-label="'+_esc(_tspName(r.k))+' shares you had" oninput="tpxOut('+i+',\'hb\',this.value,1)">'+
+        (_tpx.out.length>1?'<button type="button" class="tpx-x" aria-label="Remove '+_esc(_tspName(r.k))+'" onclick="tpxOutDel('+i+')">&times;</button>':'<span></span>')+'</div>';}).join('')+
+    '<div class="tpx-mf"><button type="button" class="pv-lnk" onclick="tpxOutAdd()">+ Add a fund</button><span></span></div>';
+}
+function tpxOut(i,f,v,soft){const r=_tpx.out[i];if(!r)return;r[f]=v;
+  if(f==='k'){_tpx.to=_tpx.to.filter(function(x){return x.k!==v;});if(!_tpx.to.length)_tpx.to=[{k:_tpxOutK().indexOf('G')<0?'G':'C',p:100}];_tpxSyncBack();_tpxKeep(_tpxRender);}
+  else{_tpxSyncBack();if(soft)tsPastPrev();else _tpxRender();}}
+function tpxOutAdd(){const used=_tpxOutK().concat(_tpx.to.map(function(r){return r.k;})),nx=TSP_FUNDS.find(function(f){return used.indexOf(f[0])<0;});if(!nx)return;_tpx.out.push({k:nx[0],sh:'',hb:''});_tpxSyncBack();_tpxRender();}
+function tpxOutDel(i){_tpx.out.splice(i,1);_tpxSyncBack();_tpxRender();}
+// until the user edits the move-back mix, it mirrors what you sold (by value on the first date)
+function _tpxSyncBack(){if(!_tpx||_tpx.bkEdited)return;const p=_tpx.px1;let tot=0;const v=_tpx.out.map(function(r){const x=(parseFloat(r.sh)||0)*(parseFloat(p[r.k])||0);tot+=x;return x;});
+  if(_tpx.out.length===1||!(tot>0)){_tpx.bk=_tpx.out.map(function(r){return {k:r.k,p:Math.round(100/_tpx.out.length)};});}
+  else{_tpx.bk=_tpx.out.map(function(r,i){return {k:r.k,p:Math.round(v[i]/tot*100)};});}
+  const s=_tpx.bk.reduce(function(a,r){return a+r.p;},0);if(_tpx.bk.length)_tpx.bk[0].p+=100-s;}
+function _tpxPxHtml(leg){
+  const ks=leg===1?_tpxFunds1():_tpxFunds2(),px=leg===1?_tpx.px1:_tpx.px2;
+  return '<div class="tpx-px">'+ks.map(function(k){return '<label><span>'+_esc(_tsShort(k))+' close</span><input type="number" step="0.0001" min="0" value="'+(parseFloat(px[k])>0?px[k]:'')+'" oninput="tpxPx('+leg+',\''+k+'\',this.value)"></label>';}).join('')+'</div>';
+}
+function _tpxRender(){
+  const ov=el('tpx-overlay');if(!ov||!_tpx)return;
+  const n1=_tpxAutoPx(1);_tpxSyncBack();const n2=_tpx.back?_tpxAutoPx(2):'';
+  const L=function(f,t){return '<label class="pf-lbl" style="display:block" for="'+f+'">'+t+'</label>';},W='width:100%;box-sizing:border-box',H=function(t){return '<div class="tpx-h">'+t+'</div>';};
+  ov.innerHTML='<div class="modal tpx-modal" style="max-width:540px">'+
+    '<div class="modal-header" style="display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;margin-bottom:.8rem"><div><h2 id="tpx-title" style="font-size:1.1rem;margin:0">Add a past transfer</h2>'+
+    '<div style="font-size:.6rem;color:var(--muted);margin-top:.25rem">For the scorecard only. Your current fund shares don’t change.</div></div><button class="modal-close" type="button" onclick="tsPastClose()" aria-label="Close">&times;</button></div>'+
+    '<div class="tpx-g">'+
+      '<div>'+L('tpx-dt','Transfer date')+'<input type="date" id="tpx-dt" max="'+_trToday()+'" value="'+_tpx.d+'" style="'+W+'" onchange="tpxSet(\'d\',this.value,1)"></div>'+
+      '<div></div>'+
+    '</div>'+
+    H('Moved out of')+_tpxOutHtml()+
+    H('Moved into')+_tpxMixHtml(1)+_tpxPxHtml(1)+'<div class="tpx-n">'+n1+'</div>'+
+    '<label class="tpx-ck"><input type="checkbox" id="tpx-back" '+(_tpx.back?'checked ':'')+'onchange="tpxSet(\'back\',this.checked,1)"> I moved back (round trip)</label>'+
+    (_tpx.back?'<div class="tpx-g"><div>'+L('tpx-bdt','Moved back on')+'<input type="date" id="tpx-bdt" max="'+_trToday()+'" value="'+_tpx.bd+'" style="'+W+'" onchange="tpxSet(\'bd\',this.value,1)"></div><div></div></div>'+
+      H('Moved back into')+_tpxMixHtml(2)+_tpxPxHtml(2)+'<div class="tpx-n">'+n2+'</div>':'')+
+    '<div id="tpx-prev" aria-live="polite" class="tpx-prev"></div>'+
+    '<div style="display:flex;gap:.5rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap"><button class="btn" type="button" onclick="tsPastClose()">Cancel</button><button class="btn primary" type="button" id="tpx-go" onclick="tsPastSave()">'+(_tpx.back?'Add round trip':'Add transfer')+'</button></div>'+
+  '</div>';
   tsPastPrev();
 }
-async function tsPastFetch(){
-  const d=(el('tpx-dt')||{}).value;if(!d)return;const b=el('tpx-get');if(b){b.disabled=true;b.textContent='Getting prices…';}
+function _tpxKeep(fn){const a=document.activeElement,id=a&&a.id;fn();if(id){const n=el(id);if(n)n.focus();}}
+function tpxSet(k,v,re){if(!_tpx)return;_tpx[k]=v;
+  if(k==='back'&&v)_tpxSyncBack();
+  if(re)_tpxKeep(_tpxRender);else tsPastPrev();}
+function tpxMix(leg,i,f,v,soft){const L=leg===1?_tpx.to:_tpx.bk;if(!L[i])return;if(leg===2)_tpx.bkEdited=true;L[i][f]=f==='p'?Math.max(0,Math.min(100,parseFloat(v)||0)):v;
+  if(soft){const sum=L.reduce(function(s,r){return s+(parseFloat(r.p)||0);},0),e=el('tpx-sum'+leg);if(e){e.textContent=sum.toFixed(0)+'% of 100%';e.style.color=Math.abs(sum-100)<0.05?'var(--green)':'var(--red)';}tsPastPrev();}
+  else _tpxRender();}
+function tpxMixAdd(leg){if(leg===2)_tpx.bkEdited=true;const L=leg===1?_tpx.to:_tpx.bk,used=L.map(function(r){return r.k;}).concat(leg===1?_tpxOutK():[]),nx=TSP_FUNDS.find(function(f){return used.indexOf(f[0])<0;});if(!nx)return;
+  const left=Math.max(0,100-L.reduce(function(s,r){return s+(parseFloat(r.p)||0);},0));L.push({k:nx[0],p:left});_tpxRender();}
+function tpxMixDel(leg,i){if(leg===2)_tpx.bkEdited=true;const L=leg===1?_tpx.to:_tpx.bk;L.splice(i,1);if(L.length===1)L[0].p=100;_tpxRender();}
+function tpxPx(leg,k,v){const px=leg===1?_tpx.px1:_tpx.px2,au=leg===1?_tpx.auto1:_tpx.auto2;px[k]=parseFloat(v)||0;au[k]=false;if(leg===1)_tpxSyncBack();tsPastPrev();}
+async function tsPastFetch(leg){
+  const d=leg===2?_tpx.bd:_tpx.d;if(!d)return;
   const ok=await tspFetchRange(_tsAdd(d,-4),_tsAdd(d,5));
   if(!ok&&typeof toast==='function')toast('TSP.gov didn’t answer from the browser — type the prices instead','var(--orange)');
-  tsPastPx();
+  if(_tpx)_tpxKeep(_tpxRender);
 }
-function tsPastBack(){const on=el('tpx-back').checked,w=el('tpx-bw');if(w)w.style.display=on?'grid':'none';const g=el('tpx-go');if(g)g.textContent=on?'Add round trip':'Add transfer';if(on){tsPastPx2();const d=el('tpx-bdt');if(d&&!d.value)setTimeout(function(){d.focus();},20);}else tsPastPrev();}
-function tsPastPx2(quiet){
-  if(!_tpx)return;const d=(el('tpx-bdt')||{}).value,f=(el('tpx-f')||{}).value,t=(el('tpx-t')||{}).value,box=el('tpx-bpxs');
-  if(!d){if(box)box.textContent='';if(!quiet)tsPastPrev();return;}
-  const P=tspPricesFor(d),a=el('tpx-bpt'),b=el('tpx-bpf'),ok=P&&(P.how==='exact'||P.how==='next')&&_tsPx(P.prices,f)>0&&_tsPx(P.prices,t)>0;
-  if(ok){if(!a.value||a.dataset.auto==='1'){a.value=_tsPx(P.prices,t);a.dataset.auto='1';}if(!b.value||b.dataset.auto==='1'){b.value=_tsPx(P.prices,f);b.dataset.auto='1';}_tpx.bpxDate=P.date;
-    box.innerHTML='Closing prices from '+_trLbl(P.date)+(P.how==='next'?' (next trading day)':'')+'.';}
-  else{_tpx.bpxDate=d;box.innerHTML='No saved closes for '+_trLbl(d)+'. <button type="button" class="pv-lnk" id="tpx-get2" onclick="tsPastFetch2()">Get them from TSP.gov</button> or type them in.';}
-  if(!quiet)tsPastPrev();
-}
-async function tsPastFetch2(){const d=(el('tpx-bdt')||{}).value;if(!d)return;const b=el('tpx-get2');if(b){b.disabled=true;b.textContent='Getting prices…';}
-  const ok=await tspFetchRange(_tsAdd(d,-4),_tsAdd(d,5));if(!ok&&typeof toast==='function')toast('TSP.gov didn’t answer from the browser — type the prices instead','var(--orange)');tsPastPx2();}
 function _tsPastRead(){
-  const g=function(i){return (el(i)||{}).value;},n=function(i){return parseFloat(g(i));};
-  const d=g('tpx-dt'),f=g('tpx-f'),t=g('tpx-t'),sh=n('tpx-sh'),hbRaw=g('tpx-hb'),pf=n('tpx-pf'),pt=n('tpx-pt');
-  const hb=hbRaw===''||hbRaw==null?sh:parseFloat(hbRaw);
+  const T=_tpx,p1=T.px1,p2=T.px2,sum=function(L){return L.reduce(function(s,r){return s+(parseFloat(r.p)||0);},0);};
+  const O=T.out.map(function(r){const sh=parseFloat(r.sh),hb=r.hb===''||r.hb==null?sh:parseFloat(r.hb);return {k:r.k,sh:sh,hb:hb};});
   let err='';
-  if(!d)err='Pick the transfer date.';else if(d>_trToday())err='That date is in the future. Use Rebalance for a new transfer.';
-  else if(f===t)err='Pick two different funds.';else if(!(sh>0))err='Enter the shares you sold.';
-  else if(!(hb>=sh-1e-6))err='Shares you had can’t be less than shares sold.';
-  else if(!(pf>0)||!(pt>0))err='Enter both closing prices.';
-  const v=(sh||0)*(pf||0),bought=pt>0?v/pt:0;
-  const back=!!(el('tpx-back')&&el('tpx-back').checked),bd=g('tpx-bdt'),bpt=n('tpx-bpt'),bpf=n('tpx-bpf');
-  if(!err&&back){if(!bd)err='Pick the date you moved back.';else if(bd<=d)err='The move back has to be after '+_trLbl(d)+'.';else if(bd>_trToday())err='The move-back date is in the future. Use the what-if on the scorecard for that.';else if(!(bpt>0)||!(bpf>0))err='Enter both prices for the move back.';}
-  const backSh=back&&bpf>0?bought*bpt/bpf:0,rtSh=backSh-(sh||0),rtUsd=rtSh*(bpf||0);
-  const dup=!err&&(tspIftLog||[]).some(function(x){const xd=x.pxDate||x.date;return (xd===(_tpx&&_tpx.pxDate||d)||x.date===d)&&((parseFloat((x.before||{})[f])||0)-(parseFloat((x.after||{})[f])||0))>0;});
-  return {d:d,f:f,t:t,sh:sh,hb:hb,pf:pf,pt:pt,v:v,bought:bought,err:err,dup:dup,back:back,bd:bd,bpt:bpt,bpf:bpf,backSh:backSh,rtSh:rtSh,rtUsd:rtUsd};
+  if(!T.d)err='Pick the transfer date.';else if(T.d>_trToday())err='That date is in the future. Use Rebalance for a new transfer.';
+  else if(O.some(function(o){return !(o.sh>0);}))err='Enter the shares you sold from each fund.';
+  else if(O.some(function(o){return !(o.hb>=o.sh-1e-6);}))err='Shares you had can’t be less than shares sold.';
+  else if(Math.abs(sum(T.to)-100)>=0.05)err='The “Moved into” mix has to add up to 100%.';
+  else if(_tpxFunds1().some(function(k){return !(parseFloat(p1[k])>0);}))err='Enter a closing price for every fund on '+_trLbl(T.d)+'.';
+  let V=0;const bought={};
+  if(!err){O.forEach(function(o){V+=o.sh*p1[o.k];});T.to.forEach(function(r){if(r.p>0)bought[r.k]=V*r.p/100/p1[r.k];});}
+  let V2=0,backSh={},rt=null;
+  if(!err&&T.back){
+    if(!T.bd)err='Pick the date you moved back.';else if(T.bd<=T.d)err='The move back has to be after '+_trLbl(T.d)+'.';else if(T.bd>_trToday())err='The move-back date is in the future. Use the what-if on the scorecard for that.';
+    else if(Math.abs(sum(T.bk)-100)>=0.05)err='The “Moved back into” mix has to add up to 100%.';
+    else if(_tpxFunds2().some(function(k){return !(parseFloat(p2[k])>0);}))err='Enter a closing price for every fund on '+_trLbl(T.bd)+'.';
+    if(!err){Object.keys(bought).forEach(function(k){V2+=bought[k]*p2[k];});T.bk.forEach(function(r){if(r.p>0)backSh[r.k]=(backSh[r.k]||0)+V2*r.p/100/p2[r.k];});
+      let stayV=0;O.forEach(function(o){stayV+=o.sh*p2[o.k];});const one=O.length===1?O[0]:null;
+      rt={usd:V2-stayV,stayV:stayV,pct:stayV>0?(V2/stayV-1)*100:0,eq:one?V2/p2[one.k]-one.sh:null,one:one,pure:!!one&&T.bk.length===1&&T.bk[0].k===one.k};}
+  }
+  const dup=!err&&(tspIftLog||[]).some(function(x){const xd=x.pxDate||x.date;return (xd===T.pxd1||x.date===T.d)&&O.some(function(o){return ((parseFloat((x.before||{})[o.k])||0)-(parseFloat((x.after||{})[o.k])||0))>0;});});
+  return {T:T,O:O,V:V,bought:bought,V2:V2,backSh:backSh,rt:rt,err:err,dup:dup};
 }
 function tsPastPrev(){
-  const r=_tsPastRead(),box=el('tpx-prev'),go=el('tpx-go');if(!box)return;if(go)go.disabled=!!r.err;
-  ['tpx-pf','tpx-pt','tpx-bpt','tpx-bpf'].forEach(function(i){const e=el(i);if(e&&document.activeElement===e)e.dataset.auto='0';});
+  if(!_tpx)return;const r=_tsPastRead(),box=el('tpx-prev'),go=el('tpx-go'),T=r.T;if(!box)return;if(go)go.disabled=!!r.err;
   if(r.err){box.innerHTML='<span style="color:var(--muted)">'+r.err+'</span>';return;}
   const row=function(l,v){return '<div style="display:flex;justify-content:space-between;gap:1rem"><span style="color:var(--muted)">'+l+'</span><span style="font-family:\'DM Mono\',monospace;text-align:right;font-weight:600">'+v+'</span></div>';};
-  box.innerHTML=row('Sold',_tsSh(r.sh)+' '+_tsShort(r.f)+' × '+_tsPxf(r.pf))+row('Amount moved',_pvM(r.v,2))+row('Bought',_tsSh(r.bought)+' '+_tsShort(r.t)+' × '+_tsPxf(r.pt))+
-    (r.hb>r.sh+1e-6?row('Left in '+_tsShort(r.f),_tsSh(r.hb-r.sh)):'')+
-    (r.back?row('Moved back',_tsSh(r.bought)+' '+_tsShort(r.t)+' × '+_tsPxf(r.bpt)+' → '+_tsSh(r.backSh)+' '+_tsShort(r.f))+
-      '<div style="display:flex;justify-content:space-between;gap:1rem;margin-top:.35rem;padding-top:.4rem;border-top:1px solid var(--border)"><span><span class="ts-tag '+(Math.abs(r.rtSh)<0.005?'even':r.rtSh>0?'good':'bad')+'" style="margin-right:.4rem">'+(Math.abs(r.rtSh)<0.005?'Even':r.rtSh>0?'Won':'Lost')+'</span>Round trip vs. staying in '+_esc(_tspName(r.f))+'</span><span style="font-family:\'DM Mono\',monospace;font-weight:600;color:'+_pvC(r.rtSh)+'">'+_tsSS(r.rtSh)+' sh · '+_pvS(r.rtUsd,0)+' at '+_pvM(r.bpf,2)+'</span></div>':'')+
-    (r.dup?'<div style="color:var(--orange);margin-top:.35rem">A transfer out of '+_esc(_tspName(r.f))+' on this date is already in your log. Adding it again would count it twice.</div>':'');
+  const list=function(o,P){return Object.keys(o).map(function(k){return _tsSh(o[k])+' '+_tsShort(k)+(P?' @ '+_tsPxf(P[k]):'');}).join(' + ');};
+  const sold={};r.O.forEach(function(o){sold[o.k]=o.sh;});
+  let h=row('Sold',list(sold,T.px1))+row('Amount moved',_pvM(r.V,2))+row('Bought',list(r.bought,T.px1));
+  r.O.forEach(function(o){if(o.hb>o.sh+1e-6)h+=row('Left in '+_tsShort(o.k),_tsSh(o.hb-o.sh));});
+  const stayName=r.O.length===1?_tspName(r.O[0].k):r.O.map(function(o){return _tsShort(o.k);}).join(' + ')+' (what you sold)';
+  if(r.rt){const m=r.rt.eq!=null?r.rt.eq:r.rt.usd,g=Math.abs(m)<(r.rt.eq!=null?0.005:0.5)?'even':m>0?'good':'bad';
+    h+=row('Moved back '+_trLbl(T.bd).replace(/, \d{4}$/,''),_pvM(r.V2,2)+' → '+list(r.backSh,null));
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.3rem 1rem;margin-top:.4rem;padding-top:.45rem;border-top:1px solid var(--border)"><span><span class="ts-tag '+g+'" style="margin-right:.4rem">'+(g==='good'?'Won':g==='bad'?'Lost':'Even')+'</span>Round trip vs. staying in '+_esc(stayName)+'</span>'+
+      '<span style="font-family:\'DM Mono\',monospace;font-weight:600;color:'+_pvC(m)+'">'+(r.rt.eq!=null?_tsSS(r.rt.eq)+' '+_tsShort(r.rt.one.k)+' sh'+(r.rt.pure?'':' equiv.')+' · ':'')+_pvS(r.rt.usd,0)+' · '+_pvP(r.rt.pct,2)+'</span></div>'+
+      (r.rt.eq!=null&&!r.rt.pure?'<div style="color:var(--muted);font-size:.58rem;margin-top:.2rem">Your mix is valued in '+_esc(_tsShort(r.rt.one.k))+' shares at the '+_trLbl(T.bd)+' close so it compares to the '+_tsSh(r.rt.one.sh)+' you sold.</div>':'')+
+      (r.rt.eq==null?'<div style="color:var(--muted);font-size:.58rem;margin-top:.2rem">Compared with keeping the exact shares you sold, valued at the '+_trLbl(T.bd)+' close.</div>':'');}
+  if(r.dup)h+='<div style="color:var(--orange);margin-top:.35rem">A transfer out of '+_esc(r.O.map(function(o){return _tsShort(o.k);}).join(' / '))+' on this date is already in your log. Adding it again would count it twice.</div>';
+  box.innerHTML=h;
 }
 function tsPastSave(){
   const r=_tsPastRead();if(r.err){toast(r.err,'var(--red)');return;}
-  const before={},after={},prices={},from={},to={};
-  before[r.f]=r.hb;after[r.f]=_r2x(r.hb-r.sh);before[r.t]=0;after[r.t]=_r2x(r.bought);
-  prices[r.f]=r.pf;prices[r.t]=r.pt;from[r.f]=100;to[r.t]=100;
-  const e={id:Date.now(),date:r.d,pxDate:(_tpx&&_tpx.pxDate)||r.d,total:_r2(r.v),before:before,after:after,prices:prices,from:from,to:to,past:true};
-  tspIftLog.push(e);
-  if(r.back){const b2={},a2={},p2={},f2={},t2={};b2[r.t]=_r2x(r.bought);a2[r.t]=0;b2[r.f]=_r2x(r.hb-r.sh);a2[r.f]=_r2x(r.hb-r.sh+r.backSh);p2[r.t]=r.bpt;p2[r.f]=r.bpf;f2[r.t]=100;t2[r.f]=100;
-    tspIftLog.push({id:e.id+1,date:r.bd,pxDate:(_tpx&&_tpx.bpxDate)||r.bd,total:_r2(r.bought*r.bpt),before:b2,after:a2,prices:p2,from:f2,to:t2,past:true});}
+  const T=r.T,id=Date.now(),b1={},a1={},p1={},f1={},t1={},outHas={};
+  r.O.forEach(function(o){b1[o.k]=o.hb;a1[o.k]=_r2x(o.hb-o.sh);f1[o.k]=r.V>0?_r2(o.sh*T.px1[o.k]/r.V*100):0;outHas[o.k]=o.hb-o.sh;});
+  Object.keys(r.bought).forEach(function(k){b1[k]=0;a1[k]=_r2x(r.bought[k]);});
+  _tpxFunds1().forEach(function(k){p1[k]=+T.px1[k];});T.to.forEach(function(x){t1[x.k]=x.p;});
+  tspIftLog.push({id:id,date:T.d,pxDate:T.pxd1||T.d,total:_r2(r.V),before:b1,after:a1,prices:p1,from:f1,to:t1,past:true});
+  if(r.rt){const b2={},a2={},p2={},f2={},t2={},ks=_tpxFunds2();
+    ks.forEach(function(k){const bef=(r.bought[k]||0)+(outHas[k]||0);b2[k]=_r2x(bef);a2[k]=_r2x(bef-(r.bought[k]||0)+(r.backSh[k]||0));p2[k]=+T.px2[k];});
+    Object.keys(r.bought).forEach(function(k){f2[k]=r.V2>0?_r2(r.bought[k]*T.px2[k]/r.V2*100):0;});T.bk.forEach(function(x){t2[x.k]=x.p;});
+    tspIftLog.push({id:id+1,date:T.bd,pxDate:T.pxd2||T.bd,total:_r2(r.V2),before:b2,after:a2,prices:p2,from:f2,to:t2,past:true});}
   tspIftLog.sort(function(a,b){const x=a.pxDate||a.date,y=b.pxDate||b.date;return x<y?1:x>y?-1:b.id-a.id;});
   tspIftLog=tspIftLog.slice(0,60);
+  const rt=r.rt,fr=r.O.map(function(o){return _tsShort(o.k);}).join('/'),to=Object.keys(r.bought).map(_tsShort).join('/');
   tsPastClose();renderTspIftLog();if(typeof scheduleAutoSave==='function')scheduleAutoSave();
-  if(r.back){toast('Round trip added · '+_tsShort(r.f)+' → '+_tsShort(r.t)+' → '+_tsShort(r.f)+' · '+_tsSS(r.rtSh)+' '+_tsShort(r.f)+' shares');tsOpen('trip',String(e.id));return;}
-  toast('Past transfer added · '+_tsShort(r.f)+' → '+_tsShort(r.t)+' on '+_trLbl(r.d));
+  if(rt){toast('Round trip added · '+(rt.eq!=null?_tsSS(rt.eq)+' '+_tsShort(rt.one.k)+' shares'+(rt.pure?'':' equiv.'):_pvS(rt.usd,0)+' vs. staying'));tsOpen('trip',String(id));return;}
+  toast('Past transfer added · '+fr+' → '+to+' on '+_trLbl(T.d));
   const ov=el('ts-overlay');if(ov&&ov.classList.contains('open'))tsOpen('moves');
 }
 function tsPastDel(id){
@@ -9133,8 +9196,8 @@ function _tsMoves(){
     const sk=Object.keys(m.stay),one=sk.length===1?sk[0]:null,bk=Object.keys(m.basket).filter(function(k){return m.basket[k]>1e-6;});
     m.pn=pn;m.one=one;m.stayNow=0;m.haveNow=0;
     sk.forEach(function(k){m.stayNow+=m.stay[k]*pn(k);});bk.forEach(function(k){m.haveNow+=m.basket[k]*pn(k);});
-    m.diff=m.haveNow-m.stayNow;m.back=!!(one&&bk.length===1&&bk[0]===one);
-    m.dSh=one&&(m.back||isOpen)&&pn(one)>0?(m.back?m.basket[one]:m.haveNow/pn(one))-m.stay[one]:null;
+    m.diff=m.haveNow-m.stayNow;m.back=!!(one&&bk.length===1&&bk[0]===one);m.mixBack=!!(one&&!isOpen&&!m.kept&&bk.length>1&&bk.indexOf(one)>=0);if(m.mixBack)m.back=true;if(!one&&!isOpen&&!m.kept&&bk.length&&bk.every(function(k){return (m.stay[k]||0)>0;}))m.back=true;
+    m.dSh=one&&(m.back||isOpen)&&pn(one)>0?((m.back&&!m.mixBack)?m.basket[one]:m.haveNow/pn(one))-m.stay[one]:null;
     m.bePx=one&&isOpen&&m.stay[one]>0?m.haveNow/m.stay[one]:null;
     m.status=isOpen?'open':(m.kept?'kept':'closed');
     const ch=[_tsSet(m.stay,m.P0)];m.legs.forEach(function(l){const s=_tsSet(l.after,l.P);if(s!==ch[ch.length-1])ch.push(s);});
@@ -9211,7 +9274,7 @@ function _tsTripHtml(m,M){
     '<span class="ts-act">'+(M.open.length||M.done.length>1?'<button type="button" class="pv-lnk" onclick="tsOpen(\'moves\')">All your moves →</button>':'')+(m.kept?'<button type="button" class="pv-lnk" onclick="tsKeep(\''+m.id+'\',false)">Track as an open move again</button>':'')+'</span></div>';
   // tiles
   h+='<div class="ts-tiles">';
-  if(m.dSh!=null)h+=_tsTile('Shares',_tsSS(m.dSh),_tsShort(x)+' shares '+(m.dSh>=0?'more':'fewer')+' than if you’d stayed · <span class="pv-num">'+_pvP(m.dSh/m.stay[x]*100,1)+'</span>',col);
+  if(m.dSh!=null)h+=_tsTile(m.mixBack?'Shares (equivalent)':'Shares',_tsSS(m.dSh),(m.mixBack?'Your '+_esc(m.chain[m.chain.length-1])+' mix, counted in '+_tsShort(x)+' shares, vs. staying':_tsShort(x)+' shares '+(m.dSh>=0?'more':'fewer')+' than if you’d stayed')+' · <span class="pv-num">'+_pvP(m.dSh/m.stay[x]*100,1)+'</span>',col);
   else h+=_tsTile('Moved money now',_pvM(m.haveNow,0),'vs. <span class="pv-num">'+_pvM(m.stayNow,0)+'</span> if you’d stayed',col);
   h+=_tsTile('Value today',_pvS(m.diff,0),x?_tsShort(x)+'’s latest close: <span class="pv-num">'+_pvM(m.pn(x),2)+'</span> ('+_tsMD(_tsNowDate())+')':'At the latest closing prices ('+_tsMD(_tsNowDate())+')',col);
   h+=_tsTile((F.fi?'At your FI date · ':'In 20 years · ')+F.yr,_pvS(F.real,0),'Today’s dollars, before tax · <span class="pv-num">'+_pvS(F.nom,0)+'</span> nominal',col);
@@ -9274,7 +9337,7 @@ function _tsDrawChart(m){
   let marks='<div class="ts-shade" style="left:'+xs.toFixed(2)+'%;width:'+Math.max(0.5,xe-xs).toFixed(2)+'%"></div>';
   const vS=x?_tsPx(m.P0,x):_tsVal(m.stay,m.P0);
   marks+='<i class="ts-dot" style="left:'+xs.toFixed(2)+'%;top:'+(Y(vS)/H*100).toFixed(2)+'%;background:var(--red)"></i><div class="ts-flag" style="left:'+Math.max(8,Math.min(88,xs)).toFixed(2)+'%;top:'+Math.max(0,Y(vS)/H*100-16).toFixed(2)+'%"><b>Sold '+_esc(x?_tsShort(x):'')+'</b> · <span class="pv-num">'+(x?_tsPxf(vS).replace(/(\.\d\d)\d\d$/,'$1'):_pvK(vS))+'</span></div>';
-  if(e0&&m.back){const vE=_tsPx(m.legs[m.legs.length-1].P,x);
+  if(e0&&m.back&&x){const vE=_tsPx(m.legs[m.legs.length-1].P,x);
     marks+='<i class="ts-dot" style="left:'+xe.toFixed(2)+'%;top:'+(Y(vE)/H*100).toFixed(2)+'%;background:var(--green)"></i><div class="ts-flag" style="left:'+Math.max(8,Math.min(88,xe)).toFixed(2)+'%;top:'+Math.min(84,Y(vE)/H*100+9).toFixed(2)+'%"><b>Bought '+_esc(_tsShort(x))+'</b> · <span class="pv-num">'+_tsPxf(vE).replace(/(\.\d\d)\d\d$/,'$1')+'</span></div>';}
   marks+='<i class="ts-dot" style="left:100%;top:'+(Y(pts[pts.length-1].v)/H*100).toFixed(2)+'%;background:var(--accent);width:10px;height:10px;margin:-5px 0 0 -5px"></i>';
   // x labels: first day, sold, bought, today — skipped when they would collide
